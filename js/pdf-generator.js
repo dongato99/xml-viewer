@@ -149,14 +149,14 @@ export function generateCFDIPdf(data) {
     // Column definitions: [label, width, align]
     const conceptCols = [
         { label: 'Clave prod/serv', w: 18, align: 'left' },
-        { label: 'No. ident.', w: 16, align: 'left' },
-        { label: 'Cantidad', w: 16, align: 'right' },
+        { label: 'No. ident.', w: 14, align: 'left' },
+        { label: 'Cantidad', w: 14, align: 'right' },
         { label: 'Clave unidad', w: 16, align: 'left' },
-        { label: 'Unidad', w: 16, align: 'left' },
+        { label: 'Unidad', w: 24, align: 'left' },
         { label: 'Valor unitario', w: 22, align: 'right' },
         { label: 'Importe', w: 22, align: 'right' },
-        { label: 'Descuento', w: 20, align: 'right' },
-        { label: 'Objeto imp.', w: CONTENT_W - (18 + 16 + 16 + 16 + 16 + 22 + 22 + 20), align: 'left' },
+        { label: 'Descuento', w: 18, align: 'right' },
+        { label: 'Objeto imp.', w: CONTENT_W - (18 + 14 + 14 + 16 + 24 + 22 + 22 + 18), align: 'left' },
     ];
 
     const ROW_H = 5;
@@ -207,7 +207,14 @@ export function generateCFDIPdf(data) {
 
         // Estimate rows needed for this concepto
         const descLines = doc.splitTextToSize('Descripción: ' + (c.descripcion || ''), CONTENT_W - 2);
-        let conceptoHeight = ROW_H + descLines.length * 2.5 + 2;
+        // Estimate data row height by checking wrapped text in each column
+        let estMaxLines = 1;
+        for (let i = 0; i < conceptCols.length; i++) {
+            const lines = doc.splitTextToSize(String(vals[i]), conceptCols[i].w - 2);
+            if (lines.length > estMaxLines) estMaxLines = lines.length;
+        }
+        const estDataRowH = Math.max(ROW_H, estMaxLines * 2.5 + 2.4);
+        let conceptoHeight = estDataRowH + descLines.length * 2.5 + 2;
         if (c.impuestos && c.impuestos.length > 0) {
             conceptoHeight += 5 + c.impuestos.length * ROW_H;
         }
@@ -216,19 +223,28 @@ export function generateCFDIPdf(data) {
 
         y = ensureSpace(doc, y, conceptoHeight);
 
-        // Data row
+        // Data row — compute wrapped text per cell and row height
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(TABLE_FONT);
+        const LINE_H = 2.5;
+        const CELL_PAD = 1.2;
+        const cellLines = [];
+        let maxLines = 1;
+        for (let i = 0; i < conceptCols.length; i++) {
+            const lines = doc.splitTextToSize(String(vals[i]), conceptCols[i].w - 2);
+            cellLines.push(lines);
+            if (lines.length > maxLines) maxLines = lines.length;
+        }
+        const dataRowH = Math.max(ROW_H, maxLines * LINE_H + CELL_PAD * 2);
         cx = MARGIN;
         for (let i = 0; i < conceptCols.length; i++) {
             const col = conceptCols[i];
-            doc.rect(cx, y, col.w, ROW_H);
+            doc.rect(cx, y, col.w, dataRowH);
             const textX = col.align === 'right' ? cx + col.w - 1 : cx + 1;
-            const cellText = doc.splitTextToSize(String(vals[i]), col.w - 2);
-            doc.text(cellText[0] || '', textX, y + 3.2, { align: col.align === 'right' ? 'right' : 'left' });
+            doc.text(cellLines[i], textX, y + CELL_PAD + LINE_H * 0.8, { align: col.align === 'right' ? 'right' : 'left' });
             cx += col.w;
         }
-        y += ROW_H;
+        y += dataRowH;
 
         // Description row (full width)
         const descText = 'Descripción: ' + (c.descripcion || '');

@@ -162,7 +162,7 @@ function applyFilters() {
             if (col.type === 'numeric') {
                 const num = parseFloat(cellVal);
                 if (isNaN(num)) return false;
-                const match = filterVal.match(/^([><=!]+)\s*(-?\d+\.?\d*)$/);
+                const match = filterVal.match(/^(>=|<=|>|<|=)\s*(-?\d+\.?\d*)$/);
                 if (match) {
                     const op = match[1];
                     const target = parseFloat(match[2]);

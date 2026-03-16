@@ -50,9 +50,10 @@ const themeToggle = document.getElementById('theme-toggle');
 
 // Theme
 function initTheme() {
-    const saved = localStorage.getItem('cfdi-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', saved);
-    updateThemeIcon(saved);
+    const saved = localStorage.getItem('cfdi-theme');
+    const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeIcon(theme);
 }
 
 function toggleTheme() {

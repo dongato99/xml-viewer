@@ -1,6 +1,31 @@
 import { parseCFDI } from './cfdi-parser.js';
-import { initGrid, setData, getVisibleRows, getAllRows, getSortState, getColumns, setColumnVisibility, getColumnVisibility } from './grid.js';
+import { parseCFDIForPrint } from './cfdi-print-parser.js';
+import { generateCFDIPdf } from './pdf-generator.js';
+import { initGrid, setData, getVisibleRows, getAllRows, getSelectedRows, getSortState, getColumns, setColumnVisibility, getColumnVisibility, clearData, removeSelectedRows, xmlStore } from './grid.js';
 import { exportToXlsx } from './export.js';
+
+// Confirm dialog helper
+const confirmDialog = document.getElementById('confirm-dialog');
+const confirmDialogMessage = document.getElementById('confirm-dialog-message');
+const confirmDialogOk = document.getElementById('confirm-dialog-ok');
+const confirmDialogCancel = document.getElementById('confirm-dialog-cancel');
+
+function showConfirm(message) {
+    return new Promise((resolve) => {
+        confirmDialogMessage.textContent = message;
+        confirmDialog.showModal();
+        function cleanup() {
+            confirmDialogOk.removeEventListener('click', onOk);
+            confirmDialogCancel.removeEventListener('click', onCancel);
+            confirmDialog.removeEventListener('cancel', onCancel);
+        }
+        function onOk() { cleanup(); confirmDialog.close(); resolve(true); }
+        function onCancel() { cleanup(); confirmDialog.close(); resolve(false); }
+        confirmDialogOk.addEventListener('click', onOk);
+        confirmDialogCancel.addEventListener('click', onCancel);
+        confirmDialog.addEventListener('cancel', onCancel);
+    });
+}
 
 // DOM refs
 const dropZone = document.getElementById('drop-zone');
@@ -14,6 +39,10 @@ const statusText = document.getElementById('status-text');
 const rowCount = document.getElementById('row-count');
 const exportAllBtn = document.getElementById('export-all');
 const exportFilteredBtn = document.getElementById('export-filtered');
+const clearAllBtn = document.getElementById('clear-all');
+const clearSelectedBtn = document.getElementById('clear-selected');
+const exportSelectedBtn = document.getElementById('export-selected');
+const printSelectedBtn = document.getElementById('print-selected');
 const columnsToggle = document.getElementById('columns-toggle');
 const columnsDropdown = document.getElementById('columns-dropdown');
 const warningsDiv = document.getElementById('warnings');
@@ -46,7 +75,14 @@ initGrid('grid-head', 'grid-body', (visible, total) => {
     statusText.textContent = `Mostrando ${visible} de ${total} filas`;
     rowCount.textContent = `${total} filas cargadas`;
     exportFilteredBtn.disabled = visible === 0;
-});
+}, (count) => {
+    clearSelectedBtn.disabled = count === 0;
+    exportSelectedBtn.disabled = count === 0;
+    printSelectedBtn.disabled = count === 0;
+    clearSelectedBtn.textContent = count > 0 ? `Quitar Seleccionados (${count})` : 'Quitar Seleccionados';
+    exportSelectedBtn.textContent = count > 0 ? `Exportar Seleccionados (${count})` : 'Exportar Seleccionados';
+    printSelectedBtn.textContent = count > 0 ? 'Imprimir Seleccionados (' + count + ')' : 'Imprimir Seleccionados';
+}, generateAndDownloadPDF);
 
 // File input
 fileInput.addEventListener('change', (e) => {
@@ -84,6 +120,7 @@ parseBtn.addEventListener('click', () => {
         showWarning(`XML pegado: versión CFDI no soportada (${result.version})`);
     } else if (result) {
         addRows([result]);
+        xmlStore.set(result.uuid, xml);
         pasteInput.value = '';
     } else {
         showWarning('El XML pegado no es un CFDI válido o tiene errores de formato.');
@@ -92,11 +129,109 @@ parseBtn.addEventListener('click', () => {
 
 // Export
 exportAllBtn.addEventListener('click', () => {
-    exportToXlsx(getAllRows(), getSortState());
+    exportToXlsx(getAllRows());
 });
 
 exportFilteredBtn.addEventListener('click', () => {
-    exportToXlsx(getVisibleRows(), getSortState());
+    exportToXlsx(getVisibleRows(), true);
+});
+
+// Clear
+clearAllBtn.addEventListener('click', async () => {
+    const total = getAllRows().length;
+    if (!await showConfirm(`¿Estás seguro de quitar las ${total} filas cargadas?`)) return;
+    clearData();
+    toolbar.hidden = true;
+    gridContainer.hidden = true;
+    statusBar.hidden = true;
+});
+
+clearSelectedBtn.addEventListener('click', async () => {
+    const count = getSelectedRows().length;
+    if (!await showConfirm(`¿Estás seguro de quitar ${count} fila${count !== 1 ? 's' : ''} seleccionada${count !== 1 ? 's' : ''}?`)) return;
+    removeSelectedRows();
+    if (getAllRows().length === 0) {
+        toolbar.hidden = true;
+        gridContainer.hidden = true;
+        statusBar.hidden = true;
+    }
+});
+
+exportSelectedBtn.addEventListener('click', () => {
+    exportToXlsx(getSelectedRows());
+});
+
+// PDF generation
+function generatePDFBlob(uuid) {
+    const xml = xmlStore.get(uuid);
+    if (!xml) return null;
+    const data = parseCFDIForPrint(xml);
+    if (!data) return null;
+    return generateCFDIPdf(data);
+}
+
+function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function generateAndDownloadPDF(uuid) {
+    const blob = generatePDFBlob(uuid);
+    if (blob) downloadBlob(blob, uuid + '.pdf');
+}
+
+async function generateAndDownloadSelectedPDFs() {
+    const selected = getSelectedRows();
+    if (selected.length === 0) return;
+
+    // Single PDF — direct download
+    if (selected.length === 1) {
+        generateAndDownloadPDF(selected[0].uuid);
+        return;
+    }
+
+    // Multiple PDFs — bundle into ZIP
+    const zip = new JSZip();
+    for (const row of selected) {
+        const blob = generatePDFBlob(row.uuid);
+        if (blob) zip.file(row.uuid + '.pdf', blob);
+    }
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+    // Build filename from date
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const filename = `CFDIs_${dateStr}.zip`;
+
+    // Try File System Access API (no MOTW) with fallback to regular download
+    if (window.showSaveFilePicker) {
+        try {
+            const handle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{ description: 'ZIP', accept: { 'application/zip': ['.zip'] } }],
+            });
+            const writable = await handle.createWritable();
+            await writable.write(zipBlob);
+            await writable.close();
+            return;
+        } catch (e) {
+            if (e.name === 'AbortError') return; // user cancelled
+            // fallback to regular download
+        }
+    }
+
+    // Fallback: regular download (will have MOTW on Windows)
+    downloadBlob(zipBlob, filename);
+}
+
+printSelectedBtn.addEventListener('click', () => {
+    generateAndDownloadSelectedPDFs();
 });
 
 // Column visibility
@@ -147,6 +282,7 @@ async function handleFiles(files) {
             }
         } else if (result) {
             rows.push(result);
+            xmlStore.set(result.uuid, text);
         } else {
             showWarning(`No se pudo parsear: ${file.name}`);
         }

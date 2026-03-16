@@ -30,13 +30,20 @@ let sortState = { column: 'fechaComprobante', direction: 'desc' };
 let filters = {};
 let columnVisibility = {};
 let onFilterChange = null;
+let onSelectionChange = null;
+const selectedRows = new Set();
+export const xmlStore = new Map();
+
+let onPdfClick = null;
 
 export function getColumns() {
     return COLUMNS;
 }
 
-export function initGrid(headId, bodyId, statusCallback) {
+export function initGrid(headId, bodyId, statusCallback, selectionCallback, pdfCallback) {
     onFilterChange = statusCallback;
+    onSelectionChange = selectionCallback;
+    onPdfClick = pdfCallback;
     COLUMNS.forEach(col => { columnVisibility[col.key] = true; });
     renderHead(headId);
 }
@@ -68,11 +75,66 @@ export function setColumnVisibility(key, visible) {
     refreshGrid();
 }
 
+export function getSelectedRows() {
+    return allRows.filter(row => selectedRows.has(row));
+}
+
+export function clearData() {
+    xmlStore.clear();
+    allRows = [];
+    filteredRows = [];
+    filters = {};
+    selectedRows.clear();
+    document.querySelectorAll('.filter-row input').forEach(input => { input.value = ''; });
+    renderBody();
+    if (onFilterChange) {
+        onFilterChange(0, 0);
+    }
+    fireSelectionChange();
+}
+
+export function removeSelectedRows() {
+    const removedUuids = [...selectedRows].map(row => row.uuid);
+    allRows = allRows.filter(row => !selectedRows.has(row));
+    selectedRows.clear();
+    removedUuids.forEach(uuid => xmlStore.delete(uuid));
+    applySort();
+    applyFilters();
+    fireSelectionChange();
+}
+
+function fireSelectionChange() {
+    if (onSelectionChange) {
+        onSelectionChange(selectedRows.size);
+    }
+}
+
 function renderHead(headId) {
     const thead = document.getElementById(headId);
 
-    // Header row
     const headerRow = document.createElement('tr');
+
+    // Select-all checkbox column
+    const selectAllTh = document.createElement('th');
+    selectAllTh.className = 'select-col';
+    const selectAllCb = document.createElement('input');
+    selectAllCb.type = 'checkbox';
+    selectAllCb.id = 'select-all';
+    selectAllCb.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+    selectAllCb.addEventListener('change', () => {
+        if (selectAllCb.checked) {
+            filteredRows.forEach(row => selectedRows.add(row));
+        } else {
+            filteredRows.forEach(row => selectedRows.delete(row));
+        }
+        renderBody();
+        fireSelectionChange();
+    });
+    selectAllTh.appendChild(selectAllCb);
+    headerRow.appendChild(selectAllTh);
+
     COLUMNS.forEach(col => {
         const th = document.createElement('th');
         th.dataset.key = col.key;
@@ -90,11 +152,21 @@ function renderHead(headId) {
         });
         headerRow.appendChild(th);
     });
+
+    const pdfTh = document.createElement('th');
+    pdfTh.className = 'pdf-col';
+    pdfTh.style.cursor = 'default';
+    headerRow.appendChild(pdfTh);
+
     thead.appendChild(headerRow);
 
-    // Filter row
     const filterRow = document.createElement('tr');
     filterRow.className = 'filter-row';
+
+    const filterSelectTh = document.createElement('th');
+    filterSelectTh.className = 'select-col';
+    filterRow.appendChild(filterSelectTh);
+
     COLUMNS.forEach(col => {
         const th = document.createElement('th');
         const input = document.createElement('input');
@@ -108,6 +180,11 @@ function renderHead(headId) {
         th.appendChild(input);
         filterRow.appendChild(th);
     });
+
+    const filterPdfTh = document.createElement('th');
+    filterPdfTh.className = 'pdf-col';
+    filterRow.appendChild(filterPdfTh);
+
     thead.appendChild(filterRow);
 
     updateSortIndicators();
@@ -131,7 +208,6 @@ function applySort() {
         let valA = a[col.key];
         let valB = b[col.key];
 
-        // Sort by raw fecha for date columns
         if (col.key === 'fechaComprobante') {
             valA = a._fechaRaw || '';
             valB = b._fechaRaw || '';
@@ -158,7 +234,6 @@ function applyFilters() {
 
             const cellVal = row[col.key];
 
-            // Numeric range filter
             if (col.type === 'numeric') {
                 const num = parseFloat(cellVal);
                 if (isNaN(num)) return false;
@@ -172,11 +247,9 @@ function applyFilters() {
                     if (op === '<=') return num <= target;
                     if (op === '=') return num === target;
                 }
-                // Fallback: text contains
                 return String(cellVal).includes(filterVal);
             }
 
-            // Text contains (case-insensitive)
             return String(cellVal || '').toLowerCase().includes(filterVal.toLowerCase());
         });
     });
@@ -193,6 +266,28 @@ function renderBody() {
 
     filteredRows.forEach(row => {
         const tr = document.createElement('tr');
+        if (row.tipoComprobanteDesc === 'Egreso') {
+            tr.classList.add('row--egreso');
+        }
+
+        // Checkbox cell
+        const selectTd = document.createElement('td');
+        selectTd.className = 'select-col';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = selectedRows.has(row);
+        cb.addEventListener('change', () => {
+            if (cb.checked) {
+                selectedRows.add(row);
+            } else {
+                selectedRows.delete(row);
+            }
+            updateSelectAll();
+            fireSelectionChange();
+        });
+        selectTd.appendChild(cb);
+        tr.appendChild(selectTd);
+
         COLUMNS.forEach(col => {
             const td = document.createElement('td');
             if (!columnVisibility[col.key]) {
@@ -206,10 +301,25 @@ function renderBody() {
             }
             tr.appendChild(td);
         });
+
+        // PDF button cell
+        const pdfTd = document.createElement('td');
+        pdfTd.className = 'pdf-col';
+        const pdfBtn = document.createElement('button');
+        pdfBtn.className = 'pdf-btn';
+        pdfBtn.textContent = 'PDF';
+        pdfBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (onPdfClick) onPdfClick(row.uuid);
+        });
+        pdfTd.appendChild(pdfBtn);
+        tr.appendChild(pdfTd);
+
         tbody.appendChild(tr);
     });
 
-    // Also update header visibility
+    updateSelectAll();
+
     document.querySelectorAll('#grid-head th[data-key]').forEach(th => {
         th.hidden = !columnVisibility[th.dataset.key];
     });
@@ -220,4 +330,17 @@ function renderBody() {
 
 function refreshGrid() {
     renderBody();
+}
+
+function updateSelectAll() {
+    const selectAllCb = document.getElementById('select-all');
+    if (!selectAllCb) return;
+    if (filteredRows.length === 0) {
+        selectAllCb.checked = false;
+        selectAllCb.indeterminate = false;
+    } else {
+        const count = filteredRows.filter(r => selectedRows.has(r)).length;
+        selectAllCb.checked = count === filteredRows.length;
+        selectAllCb.indeterminate = count > 0 && count < filteredRows.length;
+    }
 }

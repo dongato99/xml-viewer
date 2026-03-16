@@ -35,11 +35,14 @@
             <div class="toolbar__left">
                 <span id="row-count" class="toolbar__count"></span>
                 <div class="toolbar__columns">
-                    <button id="columns-toggle" class="toolbar__btn">Columnas</button>
+                    <button id="columns-toggle" class="toolbar__btn">Filtrar Columnas</button>
                     <div id="columns-dropdown" class="toolbar__dropdown" hidden></div>
                 </div>
             </div>
             <div class="toolbar__right">
+                <button id="clear-selected" class="toolbar__btn toolbar__btn--danger" disabled>Quitar Seleccionados</button>
+                <button id="clear-all" class="toolbar__btn toolbar__btn--danger">Quitar Todo</button>
+                <button id="export-selected" class="toolbar__btn toolbar__btn--primary" disabled>Exportar Seleccionados</button>
                 <button id="export-all" class="toolbar__btn toolbar__btn--primary">Exportar Todo</button>
                 <button id="export-filtered" class="toolbar__btn toolbar__btn--primary">Exportar Filtrado</button>
             </div>
@@ -59,9 +62,17 @@
         </footer>
 
         <div id="warnings" class="warnings" hidden></div>
+
+        <dialog id="confirm-dialog" class="confirm-dialog">
+            <p id="confirm-dialog-message" class="confirm-dialog__message"></p>
+            <div class="confirm-dialog__actions">
+                <button id="confirm-dialog-cancel" class="confirm-dialog__btn confirm-dialog__btn--cancel">Cancelar</button>
+                <button id="confirm-dialog-ok" class="confirm-dialog__btn confirm-dialog__btn--ok">Confirmar</button>
+            </div>
+        </dialog>
     </div>
 
     <script src="lib/xlsx.full.min.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <script src="js/bundle.js"></script>
 </body>
 </html>

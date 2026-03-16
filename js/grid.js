@@ -114,6 +114,12 @@ function renderHead(headId) {
 
     const headerRow = document.createElement('tr');
 
+    // PDF column (left of checkbox)
+    const pdfTh = document.createElement('th');
+    pdfTh.className = 'pdf-col';
+    pdfTh.style.cursor = 'default';
+    headerRow.appendChild(pdfTh);
+
     // Select-all checkbox column
     const selectAllTh = document.createElement('th');
     selectAllTh.className = 'select-col';
@@ -153,15 +159,14 @@ function renderHead(headId) {
         headerRow.appendChild(th);
     });
 
-    const pdfTh = document.createElement('th');
-    pdfTh.className = 'pdf-col';
-    pdfTh.style.cursor = 'default';
-    headerRow.appendChild(pdfTh);
-
     thead.appendChild(headerRow);
 
     const filterRow = document.createElement('tr');
     filterRow.className = 'filter-row';
+
+    const filterPdfTh = document.createElement('th');
+    filterPdfTh.className = 'pdf-col';
+    filterRow.appendChild(filterPdfTh);
 
     const filterSelectTh = document.createElement('th');
     filterSelectTh.className = 'select-col';
@@ -180,10 +185,6 @@ function renderHead(headId) {
         th.appendChild(input);
         filterRow.appendChild(th);
     });
-
-    const filterPdfTh = document.createElement('th');
-    filterPdfTh.className = 'pdf-col';
-    filterRow.appendChild(filterPdfTh);
 
     thead.appendChild(filterRow);
 
@@ -270,6 +271,19 @@ function renderBody() {
             tr.classList.add('row--egreso');
         }
 
+        // PDF button cell (left of checkbox)
+        const pdfTd = document.createElement('td');
+        pdfTd.className = 'pdf-col';
+        const pdfBtn = document.createElement('button');
+        pdfBtn.className = 'pdf-btn';
+        pdfBtn.textContent = 'PDF';
+        pdfBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (onPdfClick) onPdfClick(row.uuid);
+        });
+        pdfTd.appendChild(pdfBtn);
+        tr.appendChild(pdfTd);
+
         // Checkbox cell
         const selectTd = document.createElement('td');
         selectTd.className = 'select-col';
@@ -301,19 +315,6 @@ function renderBody() {
             }
             tr.appendChild(td);
         });
-
-        // PDF button cell
-        const pdfTd = document.createElement('td');
-        pdfTd.className = 'pdf-col';
-        const pdfBtn = document.createElement('button');
-        pdfBtn.className = 'pdf-btn';
-        pdfBtn.textContent = 'PDF';
-        pdfBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (onPdfClick) onPdfClick(row.uuid);
-        });
-        pdfTd.appendChild(pdfBtn);
-        tr.appendChild(pdfTd);
 
         tbody.appendChild(tr);
     });

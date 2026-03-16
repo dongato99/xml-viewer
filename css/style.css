@@ -304,6 +304,29 @@ body {
     height: 16px;
 }
 
+/* === PDF column === */
+.pdf-col {
+    width: 50px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.pdf-btn {
+    padding: 4px 10px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: background var(--transition);
+}
+
+.pdf-btn:hover {
+    background: var(--accent-hover);
+}
+
 /* === Grid === */
 .grid-container {
     margin-bottom: 16px;

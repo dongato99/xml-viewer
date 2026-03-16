@@ -96,3 +96,34 @@ export function lookupUsoCFDI(code) {
 export function lookupRegimenFiscal(code) {
     return REGIMEN_FISCAL[code] || code || '';
 }
+
+export const EXPORTACION = {
+    '01': 'No aplica',
+    '02': 'Definitiva',
+    '03': 'Temporal',
+    '04': 'Definitiva con clave A1',
+};
+
+export const OBJETO_IMP = {
+    '01': 'No objeto de impuesto',
+    '02': 'Sí objeto de impuesto.',
+    '03': 'Sí objeto del impuesto y no obligado al desglose',
+    '04': 'Sí objeto del impuesto y no causa impuesto',
+};
+
+export const METODO_PAGO = {
+    'PUE': 'Pago en una sola exhibición',
+    'PPD': 'Pago en parcialidades o diferido',
+};
+
+export function lookupExportacion(code) {
+    return EXPORTACION[code] || code || '';
+}
+
+export function lookupObjetoImp(code) {
+    return OBJETO_IMP[code] || code || '';
+}
+
+export function lookupMetodoPago(code) {
+    return METODO_PAGO[code] || code || '';
+}

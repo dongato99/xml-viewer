@@ -1550,29 +1550,12 @@ function generateAndDownloadPDF(uuid) {
     downloadBlob(blob, uuid + '.pdf');
 }
 
-async function generateAndDownloadSelectedPDFs() {
+function generateAndDownloadSelectedPDFs() {
     const selected = getSelectedRows();
     if (selected.length === 0) return;
-    if (selected.length === 1) {
-        generateAndDownloadPDF(selected[0].uuid);
-        return;
-    }
-    const zip = new JSZip();
-    let count = 0;
     for (const row of selected) {
-        const xml = xmlStore.get(row.uuid);
-        if (!xml) continue;
-        const data = parseCFDIForPrint(xml);
-        if (!data) continue;
-        const blob = generateCFDIPdf(data);
-        zip.file(row.uuid + '.pdf', blob);
-        count++;
+        generateAndDownloadPDF(row.uuid);
     }
-    if (count === 0) return;
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    const now = new Date();
-    const dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-    downloadBlob(zipBlob, 'CFDIs_' + dateStr + '.zip');
 }
 
 printSelectedBtn.addEventListener('click', () => {

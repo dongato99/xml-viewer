@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,16 +9,58 @@
 <body>
     <div id="app">
         <header class="header">
-            <h1>XML Viewer CFDI</h1>
-            <button id="theme-toggle" aria-label="Toggle theme">🌙</button>
+            <h1 class="header__title">XML Viewer CFDI</h1>
+            <button id="theme-toggle" class="header__theme-btn" aria-label="Cambiar tema">
+                <span class="theme-icon">🌙</span>
+            </button>
         </header>
-        <main>
-            <section id="input-area"></section>
-            <section id="toolbar"></section>
-            <section id="grid-container"></section>
-            <footer id="status-bar"></footer>
-        </main>
+
+        <section class="input-area">
+            <div class="input-area__drop-zone" id="drop-zone">
+                <p class="drop-zone__text">Arrastra archivos XML aquí</p>
+                <p class="drop-zone__sub">o</p>
+                <label class="drop-zone__btn">
+                    Seleccionar archivos
+                    <input type="file" id="file-input" multiple accept=".xml" hidden>
+                </label>
+            </div>
+            <div class="input-area__paste">
+                <textarea id="paste-input" class="paste__textarea"
+                    placeholder="Pega XML aquí..."></textarea>
+                <button id="parse-btn" class="paste__btn">Parsear</button>
+            </div>
+        </section>
+
+        <section class="toolbar" id="toolbar" hidden>
+            <div class="toolbar__left">
+                <span id="row-count" class="toolbar__count"></span>
+                <div class="toolbar__columns">
+                    <button id="columns-toggle" class="toolbar__btn">Columnas</button>
+                    <div id="columns-dropdown" class="toolbar__dropdown" hidden></div>
+                </div>
+            </div>
+            <div class="toolbar__right">
+                <button id="export-all" class="toolbar__btn toolbar__btn--primary">Exportar Todo</button>
+                <button id="export-filtered" class="toolbar__btn toolbar__btn--primary">Exportar Filtrado</button>
+            </div>
+        </section>
+
+        <section id="grid-container" class="grid-container" hidden>
+            <div class="grid-wrapper">
+                <table id="data-grid" class="data-grid">
+                    <thead id="grid-head"></thead>
+                    <tbody id="grid-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer id="status-bar" class="status-bar" hidden>
+            <span id="status-text"></span>
+        </footer>
+
+        <div id="warnings" class="warnings" hidden></div>
     </div>
+
     <script src="lib/xlsx.full.min.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>

@@ -703,11 +703,11 @@ td.frozen-col[data-key="rfcEmisor"] {
     .toolbar__dropdown {
         min-width: min(280px, 60vw);
     }
-}
-
-@media (min-width: 576px) and (max-width: 991.98px) {
     .frozen-col[data-key="rfcEmisor"],
     td.frozen-col[data-key="rfcEmisor"] {
         max-width: 90px;
+    }
+    .data-grid .filter-row th {
+        top: 36px;
     }
 }

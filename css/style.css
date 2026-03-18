@@ -382,6 +382,12 @@ body {
     font-size: 0.85rem;
 }
 
+.data-grid thead,
+.data-grid tbody,
+.data-grid tr {
+    border: none;
+}
+
 .data-grid th {
     position: sticky;
     top: 0;

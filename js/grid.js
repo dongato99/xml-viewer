@@ -351,6 +351,15 @@ export function createGrid(config) {
 
     renderHead();
 
+    // Scroll fade indicator
+    const wrapper = container.querySelector('.grid-wrapper');
+    if (wrapper) {
+        wrapper.addEventListener('scroll', () => {
+            const atEnd = wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 1;
+            wrapper.classList.toggle('scrolled-end', atEnd);
+        });
+    }
+
     return {
         getColumns,
         getAllRows,

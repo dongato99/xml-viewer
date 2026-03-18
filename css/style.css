@@ -91,6 +91,45 @@ body {
     border-color: var(--accent);
 }
 
+/* === Tabs === */
+.tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border-light);
+    margin-bottom: 16px;
+}
+
+.tabs__btn {
+    padding: 10px 24px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.tabs__btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+}
+
+.tabs__btn--active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+/* === Tab Content === */
+.tab-content {
+    display: none;
+}
+
+.tab-content--active {
+    display: block;
+}
+
 /* === Input Area === */
 .input-area {
     display: grid;

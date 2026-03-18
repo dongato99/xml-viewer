@@ -36,10 +36,12 @@ export function parseCFDI(xmlString, filename) {
     const emisor = doc.getElementsByTagNameNS(ns, 'Emisor')[0];
     const receptor = doc.getElementsByTagNameNS(ns, 'Receptor')[0];
 
-    // Traslados — read from Comprobante-level Impuestos summary (pre-summed by SAT)
+    // Traslados & Retenciones — read from Comprobante-level Impuestos summary (pre-summed by SAT)
     const impuestos = doc.getElementsByTagNameNS(ns, 'Impuestos');
     let baseTraslado = null;
     let importeTraslado = null;
+    let baseRetencion = null;
+    let importeRetencion = null;
     for (let i = 0; i < impuestos.length; i++) {
         const imp = impuestos[i];
         if (imp.parentElement !== comprobante) continue;
@@ -51,6 +53,14 @@ export function parseCFDI(xmlString, filename) {
             if (!isNaN(b)) baseTraslado = (baseTraslado || 0) + b;
             if (!isNaN(importe)) importeTraslado = (importeTraslado || 0) + importe;
         }
+        const retenciones = imp.getElementsByTagNameNS(ns, 'Retencion');
+        for (let j = 0; j < retenciones.length; j++) {
+            const r = retenciones[j];
+            const b = parseFloat(r.getAttribute('Base'));
+            const importe = parseFloat(r.getAttribute('Importe'));
+            if (!isNaN(b)) baseRetencion = (baseRetencion || 0) + b;
+            if (!isNaN(importe)) importeRetencion = (importeRetencion || 0) + importe;
+        }
         break;
     }
 
@@ -58,6 +68,8 @@ export function parseCFDI(xmlString, filename) {
     const total = parseFloat(attr(comprobante, 'Total')) * sign;
     if (baseTraslado !== null) baseTraslado *= sign;
     if (importeTraslado !== null) importeTraslado *= sign;
+    if (baseRetencion !== null) baseRetencion *= sign;
+    if (importeRetencion !== null) importeRetencion *= sign;
 
     const tfd = doc.getElementsByTagNameNS(NS_TFD, 'TimbreFiscalDigital')[0];
     const uuid = attr(tfd, 'UUID');
@@ -91,6 +103,8 @@ export function parseCFDI(xmlString, filename) {
         tipoCambio,
         baseTraslado,
         importeTraslado,
+        baseRetencion,
+        importeRetencion,
         total,
         formaPago,
         formaPagoDesc: lookupFormaPago(formaPago),

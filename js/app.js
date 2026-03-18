@@ -97,6 +97,8 @@ const COLUMNS = [
     { key: 'tipoCambio', label: 'Tipo Cambio', type: 'text' },
     { key: 'baseTraslado', label: 'Base Traslado', type: 'numeric' },
     { key: 'importeTraslado', label: 'Importe Traslado', type: 'numeric' },
+    { key: 'baseRetencion', label: 'Base Retención', type: 'numeric' },
+    { key: 'importeRetencion', label: 'Importe Retención', type: 'numeric' },
     { key: 'total', label: 'Total', type: 'numeric' },
     { key: 'formaPago', label: 'Forma Pago', type: 'text' },
     { key: 'formaPagoDesc', label: 'Forma Pago Desc', type: 'text' },

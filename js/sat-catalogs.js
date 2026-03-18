@@ -127,3 +127,17 @@ export function lookupObjetoImp(code) {
 export function lookupMetodoPago(code) {
     return METODO_PAGO[code] || code || '';
 }
+
+export const MONEDA = {
+    'MXN': 'Peso Mexicano',
+    'USD': 'Dólar americano',
+    'EUR': 'Euro',
+    'GBP': 'Libra Esterlina',
+    'JPY': 'Yen',
+    'CAD': 'Dólar canadiense',
+    'XXX': 'Los códigos asignados para las transacciones en que intervenga ninguna moneda',
+};
+
+export function lookupMoneda(code) {
+    return MONEDA[code] || code || '';
+}

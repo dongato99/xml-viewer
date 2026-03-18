@@ -166,15 +166,15 @@ export function generatePagoPdf(data) {
     // SECTION 2: Conceptos Table
     // ================================================================
     const conceptCols = [
-        { label: 'Clave del producto\ny/o servicio', w: 20, align: 'left' },
-        { label: 'No. identificación', w: 18, align: 'left' },
+        { label: 'Clave prod/serv', w: 18, align: 'left' },
+        { label: 'No. ident.', w: 14, align: 'left' },
         { label: 'Cantidad', w: 14, align: 'right' },
-        { label: 'Clave de unidad', w: 18, align: 'left' },
-        { label: 'Unidad', w: 22, align: 'left' },
-        { label: 'Valor unitario', w: 20, align: 'right' },
-        { label: 'Importe', w: 20, align: 'right' },
+        { label: 'Clave unidad', w: 16, align: 'left' },
+        { label: 'Unidad', w: 24, align: 'left' },
+        { label: 'Valor unitario', w: 22, align: 'right' },
+        { label: 'Importe', w: 22, align: 'right' },
         { label: 'Descuento', w: 18, align: 'right' },
-        { label: 'Objeto impuesto', w: CONTENT_W - (20 + 18 + 14 + 18 + 22 + 20 + 20 + 18), align: 'left' },
+        { label: 'Objeto imp.', w: CONTENT_W - (18 + 14 + 14 + 16 + 24 + 22 + 22 + 18), align: 'left' },
     ];
 
     y = drawSectionTitle(doc, y, 'Conceptos');

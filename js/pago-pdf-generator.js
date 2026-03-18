@@ -72,24 +72,41 @@ function drawSectionTitle(doc, y, title) {
 
 function drawSimpleTable(doc, y, columns, rows) {
     const totalW = columns.reduce((s, c) => s + c.w, 0);
-    y = ensureSpace(doc, y, HEADER_ROW_H + rows.length * ROW_H);
+    const LINE_H = 2.2;
+    const CELL_PAD = 1;
 
-    // Header
+    // Compute wrapped header lines and header row height
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(TABLE_FONT);
+    const headerLines = columns.map(col => doc.splitTextToSize(col.label, col.w - 2));
+    const maxHeaderLines = Math.max(...headerLines.map(l => l.length));
+    const headerH = Math.max(HEADER_ROW_H, maxHeaderLines * LINE_H + CELL_PAD * 2);
+
+    y = ensureSpace(doc, y, headerH + rows.length * ROW_H);
+
+    // Header background
     doc.setFillColor(...GRAY_BG);
-    doc.rect(MARGIN, y - 3.5, totalW, HEADER_ROW_H, 'F');
+    doc.rect(MARGIN, y, totalW, headerH, 'F');
     doc.setDrawColor(100, 100, 100);
+
+    // Header cells — centered
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(TABLE_FONT);
     let cx = MARGIN;
-    for (const col of columns) {
-        doc.rect(cx, y - 3.5, col.w, HEADER_ROW_H);
-        const textX = col.align === 'right' ? cx + col.w - 1 : cx + 1;
-        doc.text(col.label, textX, y, { align: col.align === 'right' ? 'right' : 'left' });
+    for (let i = 0; i < columns.length; i++) {
+        const col = columns[i];
+        doc.rect(cx, y, col.w, headerH);
+        const lines = headerLines[i];
+        const textH = lines.length * LINE_H;
+        const startY = y + (headerH - textH) / 2 + LINE_H * 0.8;
+        for (let j = 0; j < lines.length; j++) {
+            doc.text(lines[j], cx + col.w / 2, startY + j * LINE_H, { align: 'center' });
+        }
         cx += col.w;
     }
-    y += HEADER_ROW_H - 3.5;
+    y += headerH;
 
-    // Rows
+    // Data rows — centered
     doc.setFont('helvetica', 'normal');
     for (const row of rows) {
         y = ensureSpace(doc, y, ROW_H);
@@ -97,8 +114,8 @@ function drawSimpleTable(doc, y, columns, rows) {
         for (let i = 0; i < columns.length; i++) {
             const col = columns[i];
             doc.rect(cx, y, col.w, ROW_H);
-            const textX = col.align === 'right' ? cx + col.w - 1 : cx + 1;
-            doc.text(String(row[i] ?? ''), textX, y + 3.2, { align: col.align === 'right' ? 'right' : 'left' });
+            const textY = y + ROW_H / 2 + TABLE_FONT * 0.15;
+            doc.text(String(row[i] ?? ''), cx + col.w / 2, textY, { align: 'center' });
             cx += col.w;
         }
         y += ROW_H;
@@ -166,15 +183,15 @@ export function generatePagoPdf(data) {
     // SECTION 2: Conceptos Table
     // ================================================================
     const conceptCols = [
-        { label: 'Clave prod/serv', w: 18, align: 'left' },
-        { label: 'No. ident.', w: 14, align: 'left' },
-        { label: 'Cantidad', w: 14, align: 'right' },
-        { label: 'Clave unidad', w: 16, align: 'left' },
-        { label: 'Unidad', w: 24, align: 'left' },
-        { label: 'Valor unitario', w: 22, align: 'right' },
-        { label: 'Importe', w: 22, align: 'right' },
-        { label: 'Descuento', w: 18, align: 'right' },
-        { label: 'Objeto imp.', w: CONTENT_W - (18 + 14 + 14 + 16 + 24 + 22 + 22 + 18), align: 'left' },
+        { label: 'Clave del producto y/o servicio', w: 20 },
+        { label: 'No. identificación', w: 18 },
+        { label: 'Cantidad', w: 16 },
+        { label: 'Clave de unidad', w: 18 },
+        { label: 'Unidad', w: 20 },
+        { label: 'Valor unitario', w: 22 },
+        { label: 'Importe', w: 20 },
+        { label: 'Descuento', w: 18 },
+        { label: 'Objeto impuesto', w: CONTENT_W - (20 + 18 + 16 + 18 + 20 + 22 + 20 + 18) },
     ];
 
     y = drawSectionTitle(doc, y, 'Conceptos');

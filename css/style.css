@@ -546,6 +546,36 @@ body {
     opacity: 0.85;
 }
 
+/* === Frozen Columns === */
+.frozen-col {
+    background: var(--bg-primary);
+}
+
+.data-grid thead .frozen-col {
+    background: var(--bg-tertiary);
+}
+
+.data-grid .filter-row .frozen-col {
+    background: var(--bg-secondary);
+}
+
+.data-grid tbody tr:nth-child(even) .frozen-col {
+    background: var(--bg-secondary);
+}
+
+.data-grid tbody tr:hover .frozen-col {
+    background: var(--accent-light);
+}
+
+/* RFC Emisor column responsive trimming */
+.frozen-col[data-key="rfcEmisor"],
+td.frozen-col[data-key="rfcEmisor"] {
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* === Responsive === */
 /* Desktop: single row toolbar */
 @media (min-width: 992px) {
@@ -609,10 +639,21 @@ body {
         min-width: calc(100vw - 48px);
         left: -16px;
     }
+    .frozen-col[data-key="rfcEmisor"],
+    td.frozen-col[data-key="rfcEmisor"] {
+        max-width: 70px;
+    }
 }
 
 @media (min-width: 576px) and (max-width: 991.98px) {
     .toolbar__dropdown {
         min-width: min(280px, 60vw);
+    }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .frozen-col[data-key="rfcEmisor"],
+    td.frozen-col[data-key="rfcEmisor"] {
+        max-width: 90px;
     }
 }

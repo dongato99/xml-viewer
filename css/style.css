@@ -188,8 +188,8 @@ body {
 /* === Toolbar === */
 .toolbar {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 10px;
     padding: 12px 16px;
     background: var(--bg-primary);
     border: 1px solid var(--border-light);
@@ -198,10 +198,22 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-.toolbar__left, .toolbar__right {
+.toolbar__top {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
+}
+
+.toolbar__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.toolbar__group {
+    display: flex;
+    gap: 6px;
 }
 
 .toolbar__count {
@@ -535,6 +547,18 @@ body {
 }
 
 /* === Responsive === */
+/* Desktop: single row toolbar */
+@media (min-width: 992px) {
+    .toolbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .toolbar__actions {
+        flex-wrap: nowrap;
+    }
+}
+
 @media (max-width: 991.98px) {
     .input-area {
         grid-template-columns: 1fr 1fr;
@@ -565,5 +589,30 @@ body {
     }
     .paste__textarea {
         min-height: 80px;
+    }
+    .toolbar__top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .toolbar__actions {
+        flex-direction: column;
+    }
+    .toolbar__group {
+        display: flex;
+        width: 100%;
+    }
+    .toolbar__group .toolbar__btn {
+        flex: 1;
+        min-height: 44px;
+    }
+    .toolbar__dropdown {
+        min-width: calc(100vw - 48px);
+        left: -16px;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .toolbar__dropdown {
+        min-width: min(280px, 60vw);
     }
 }

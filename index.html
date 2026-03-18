@@ -33,20 +33,26 @@
         </section>
 
         <section class="toolbar" id="toolbar" hidden>
-            <div class="toolbar__left">
+            <div class="toolbar__top">
                 <span id="row-count" class="toolbar__count"></span>
                 <div class="toolbar__columns">
                     <button id="columns-toggle" class="toolbar__btn">Filtrar Columnas</button>
                     <div id="columns-dropdown" class="toolbar__dropdown" hidden></div>
                 </div>
             </div>
-            <div class="toolbar__right">
-                <button id="clear-selected" class="toolbar__btn toolbar__btn--danger" disabled>Quitar Seleccionados</button>
-                <button id="clear-all" class="toolbar__btn toolbar__btn--danger">Quitar Todo</button>
-                <button id="export-selected" class="toolbar__btn toolbar__btn--primary" disabled>Exportar Seleccionados</button>
-                <button id="export-all" class="toolbar__btn toolbar__btn--primary">Exportar Todo</button>
-                <button id="export-filtered" class="toolbar__btn toolbar__btn--primary">Exportar Filtrado</button>
-                <button id="print-selected" class="toolbar__btn toolbar__btn--primary" disabled>Imprimir Seleccionados</button>
+            <div class="toolbar__actions">
+                <div class="toolbar__group toolbar__group--danger">
+                    <button id="clear-all" class="toolbar__btn toolbar__btn--danger">Quitar Todo</button>
+                    <button id="clear-selected" class="toolbar__btn toolbar__btn--danger" disabled>Quitar Seleccionados</button>
+                </div>
+                <div class="toolbar__group toolbar__group--primary">
+                    <button id="export-all" class="toolbar__btn toolbar__btn--primary">Exportar Todo</button>
+                    <button id="export-filtered" class="toolbar__btn toolbar__btn--primary">Exportar Filtrado</button>
+                </div>
+                <div class="toolbar__group toolbar__group--primary">
+                    <button id="export-selected" class="toolbar__btn toolbar__btn--primary" disabled>Exportar Seleccionados</button>
+                    <button id="print-selected" class="toolbar__btn toolbar__btn--primary" disabled>Imprimir Seleccionados</button>
+                </div>
             </div>
         </section>
 

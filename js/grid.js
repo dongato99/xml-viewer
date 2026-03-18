@@ -8,11 +8,11 @@
  * @param {Function} config.onFilterChange - (visible, total) callback
  * @param {Function} config.onSelectionChange - (count) callback
  * @param {Function} config.onPdfClick - (uuid) callback
- * @param {string} [config.egresoField] - Field to check for Egreso styling (e.g. 'tipoComprobanteDesc')
+ * @param {Array} [config.rowStyles] - [{field, value, className}] for conditional row styling
  * @returns {Object} Grid instance with public methods
  */
 export function createGrid(config) {
-    const { columns, container, headId, bodyId, onFilterChange, onSelectionChange, onPdfClick, egresoField } = config;
+    const { columns, container, headId, bodyId, onFilterChange, onSelectionChange, onPdfClick, rowStyles } = config;
 
     let allRows = [];
     let filteredRows = [];
@@ -229,8 +229,12 @@ export function createGrid(config) {
 
         filteredRows.forEach(row => {
             const tr = document.createElement('tr');
-            if (egresoField && row[egresoField] === 'Egreso') {
-                tr.classList.add('row--egreso');
+            if (rowStyles) {
+                for (const rs of rowStyles) {
+                    if (row[rs.field] === rs.value) {
+                        tr.classList.add(rs.className);
+                    }
+                }
             }
 
             const pdfTd = document.createElement('td');

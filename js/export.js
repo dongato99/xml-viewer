@@ -19,7 +19,7 @@ function autofitColumns(ws, aoa) {
     ws['!cols'] = colWidths.map(w => ({ wch: Math.min(w + 2, 60) }));
 }
 
-function buildSheet(cols, rows, egresoKey) {
+function buildSheet(cols, rows, rowColors) {
     const headers = cols.map(col => col.label);
     const data = rows.map(row =>
         cols.map(col => {
@@ -32,16 +32,19 @@ function buildSheet(cols, rows, egresoKey) {
     const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
     ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: 0, c: cols.length - 1 } }) };
 
-    // Red font for Egreso rows
-    if (egresoKey) {
+    // Conditional row coloring
+    if (rowColors) {
         rows.forEach((row, i) => {
-            if (row[egresoKey] === 'Egreso') {
-                const r = i + 1;
-                for (let c = 0; c < cols.length; c++) {
-                    const addr = XLSX.utils.encode_cell({ r, c });
-                    if (ws[addr]) {
-                        ws[addr].s = { font: { color: { rgb: 'FF0000' } } };
+            for (const rc of rowColors) {
+                if (row[rc.field] === rc.value) {
+                    const r = i + 1;
+                    for (let c = 0; c < cols.length; c++) {
+                        const addr = XLSX.utils.encode_cell({ r, c });
+                        if (ws[addr]) {
+                            ws[addr].s = { font: { color: { rgb: rc.rgb } } };
+                        }
                     }
+                    break;
                 }
             }
         });
@@ -51,7 +54,7 @@ function buildSheet(cols, rows, egresoKey) {
     return ws;
 }
 
-export function exportToXlsx(rows, columns, egresoKey, columnVisibility) {
+export function exportToXlsx(rows, columns, rowColors, columnVisibility) {
     if (!rows || rows.length === 0) return;
 
     // Filter columns by visibility if provided
@@ -61,11 +64,11 @@ export function exportToXlsx(rows, columns, egresoKey, columnVisibility) {
 
     const wb = XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(wb, buildSheet(cols, rows, egresoKey), 'Sheet0');
+    XLSX.utils.book_append_sheet(wb, buildSheet(cols, rows, rowColors), 'Sheet0');
 
     const hoja1Columns = cols.filter(col => HOJA1_KEYS.includes(col.key));
     if (hoja1Columns.length > 0) {
-        XLSX.utils.book_append_sheet(wb, buildSheet(hoja1Columns, rows, egresoKey), 'Hoja1');
+        XLSX.utils.book_append_sheet(wb, buildSheet(hoja1Columns, rows, rowColors), 'Hoja1');
     }
 
     const filename = generateFilename(rows);

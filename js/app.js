@@ -33,38 +33,27 @@ function showConfirm(message) {
 }
 
 // ============================================================
-// Shared DOM refs
+// DOM refs
 // ============================================================
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const pasteInput = document.getElementById('paste-input');
 const parseBtn = document.getElementById('parse-btn');
+const toolbar = document.getElementById('toolbar');
+const gridContainer = document.getElementById('grid-container');
+const statusBar = document.getElementById('status-bar');
+const statusText = document.getElementById('status-text');
+const rowCount = document.getElementById('row-count');
+const exportAllBtn = document.getElementById('export-all');
+const exportFilteredBtn = document.getElementById('export-filtered');
+const exportSelectedBtn = document.getElementById('export-selected');
+const clearAllBtn = document.getElementById('clear-all');
+const clearSelectedBtn = document.getElementById('clear-selected');
+const printSelectedBtn = document.getElementById('print-selected');
+const columnsToggle = document.getElementById('columns-toggle');
+const columnsDropdown = document.getElementById('columns-dropdown');
 const warningsDiv = document.getElementById('warnings');
 const themeToggle = document.getElementById('theme-toggle');
-
-// ============================================================
-// Tab switching
-// ============================================================
-let activeTab = 'facturas';
-const tabBtns = document.querySelectorAll('.tabs__btn');
-const tabContents = {
-    facturas: document.getElementById('tab-facturas'),
-    pagos: document.getElementById('tab-pagos'),
-};
-
-function switchTab(tab) {
-    activeTab = tab;
-    tabBtns.forEach(btn => {
-        btn.classList.toggle('tabs__btn--active', btn.dataset.tab === tab);
-    });
-    Object.entries(tabContents).forEach(([key, el]) => {
-        el.classList.toggle('tab-content--active', key === tab);
-    });
-}
-
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
 
 // ============================================================
 // Theme
@@ -92,14 +81,18 @@ themeToggle.addEventListener('click', toggleTheme);
 initTheme();
 
 // ============================================================
-// Facturas Grid
+// Unified Grid — all columns for both Facturas and Pagos
 // ============================================================
-const FACTURAS_COLUMNS = [
+const COLUMNS = [
+    // Shared
     { key: 'fechaComprobante', label: 'Fecha Comprobante', type: 'text', rawKey: '_fechaRaw' },
     { key: 'serie', label: 'Serie', type: 'text' },
     { key: 'folio', label: 'Folio', type: 'text' },
     { key: 'rfcEmisor', label: 'RFC Emisor', type: 'text' },
     { key: 'nombreEmisor', label: 'Nombre Emisor', type: 'text' },
+    { key: 'uuid', label: 'UUID', type: 'text' },
+    { key: 'tipoComprobanteDesc', label: 'Tipo Comprobante', type: 'text' },
+    // Facturas
     { key: 'moneda', label: 'Moneda', type: 'text' },
     { key: 'tipoCambio', label: 'Tipo Cambio', type: 'text' },
     { key: 'baseTraslado', label: 'Base Traslado', type: 'numeric' },
@@ -110,64 +103,15 @@ const FACTURAS_COLUMNS = [
     { key: 'usoCFDI', label: 'Uso CFDI', type: 'text' },
     { key: 'regimenFiscalReceptor', label: 'Régimen Fiscal Receptor', type: 'text' },
     { key: 'claveProdServDesc', label: 'Clave Prod/Serv Desc', type: 'text' },
-    { key: 'uuid', label: 'UUID', type: 'text' },
     { key: 'estatus', label: 'Estatus', type: 'text' },
     { key: 'validez', label: 'Validez', type: 'text' },
-    { key: 'tipoDocumento', label: 'Tipo Documento', type: 'text' },
     { key: 'versionComprobante', label: 'Versión Comprobante', type: 'text' },
-    { key: 'tipoComprobanteDesc', label: 'Tipo Comprobante Desc', type: 'text' },
-    { key: 'tipoComprobante', label: 'Tipo Comprobante', type: 'text' },
-];
-
-const facturasUI = {
-    toolbar: document.getElementById('toolbar-facturas'),
-    gridContainer: document.getElementById('grid-container-facturas'),
-    statusBar: document.getElementById('status-bar-facturas'),
-    statusText: document.getElementById('status-text-facturas'),
-    rowCount: document.getElementById('row-count-facturas'),
-    exportAll: document.getElementById('export-all-facturas'),
-    exportFiltered: document.getElementById('export-filtered-facturas'),
-    exportSelected: document.getElementById('export-selected-facturas'),
-    clearAll: document.getElementById('clear-all-facturas'),
-    clearSelected: document.getElementById('clear-selected-facturas'),
-    printSelected: document.getElementById('print-selected-facturas'),
-    columnsToggle: document.getElementById('columns-toggle-facturas'),
-    columnsDropdown: document.getElementById('columns-dropdown-facturas'),
-};
-
-const facturasGrid = createGrid({
-    columns: FACTURAS_COLUMNS,
-    container: tabContents.facturas,
-    headId: 'grid-head-facturas',
-    bodyId: 'grid-body-facturas',
-    egresoField: 'tipoComprobanteDesc',
-    onFilterChange: (visible, total) => {
-        facturasUI.statusText.textContent = `Mostrando ${visible} de ${total} filas`;
-        facturasUI.rowCount.textContent = `${total} filas cargadas`;
-        facturasUI.exportFiltered.disabled = visible === 0;
-    },
-    onSelectionChange: (count) => {
-        facturasUI.clearSelected.disabled = count === 0;
-        facturasUI.exportSelected.disabled = count === 0;
-        facturasUI.printSelected.disabled = count === 0;
-        facturasUI.clearSelected.textContent = count > 0 ? `Quitar Seleccionados (${count})` : 'Quitar Seleccionados';
-        facturasUI.exportSelected.textContent = count > 0 ? `Exportar Seleccionados (${count})` : 'Exportar Seleccionados';
-        facturasUI.printSelected.textContent = count > 0 ? `Imprimir Seleccionados (${count})` : 'Imprimir Seleccionados';
-    },
-    onPdfClick: (uuid) => generateAndDownloadPDF(uuid, facturasGrid.getXmlStore(), parseCFDIForPrint, generateCFDIPdf),
-});
-
-// ============================================================
-// Pagos Grid
-// ============================================================
-const PAGOS_COLUMNS = [
+    // Pagos
     { key: 'fechaPago', label: 'Fecha Pago', type: 'text', rawKey: '_fechaPagoRaw' },
-    { key: 'formaPagoDesc', label: 'Forma Pago', type: 'text' },
+    { key: 'formaPagoPagoDesc', label: 'Forma Pago (Pago)', type: 'text' },
     { key: 'monedaP', label: 'Moneda Pago', type: 'text' },
     { key: 'montoPago', label: 'Monto Pago', type: 'numeric' },
     { key: 'numOperacion', label: 'Num Operación', type: 'text' },
-    { key: 'rfcEmisor', label: 'RFC Emisor', type: 'text' },
-    { key: 'nombreEmisor', label: 'Emisor', type: 'text' },
     { key: 'rfcReceptor', label: 'RFC Receptor', type: 'text' },
     { key: 'nombreReceptor', label: 'Receptor', type: 'text' },
     { key: 'uuidDocRel', label: 'UUID Doc Rel', type: 'text' },
@@ -180,126 +124,113 @@ const PAGOS_COLUMNS = [
     { key: 'impSaldoInsoluto', label: 'Saldo Insoluto', type: 'numeric' },
     { key: 'baseDR', label: 'Base IVA DR', type: 'numeric' },
     { key: 'importeDR', label: 'Importe IVA DR', type: 'numeric' },
-    { key: 'uuid', label: 'UUID Pago', type: 'text' },
-    { key: 'serie', label: 'Serie', type: 'text' },
-    { key: 'folio', label: 'Folio', type: 'text' },
-    { key: 'fechaComprobante', label: 'Fecha Emisión', type: 'text', rawKey: '_fechaComprobanteRaw' },
 ];
 
-const pagosUI = {
-    toolbar: document.getElementById('toolbar-pagos'),
-    gridContainer: document.getElementById('grid-container-pagos'),
-    statusBar: document.getElementById('status-bar-pagos'),
-    statusText: document.getElementById('status-text-pagos'),
-    rowCount: document.getElementById('row-count-pagos'),
-    exportAll: document.getElementById('export-all-pagos'),
-    exportFiltered: document.getElementById('export-filtered-pagos'),
-    exportSelected: document.getElementById('export-selected-pagos'),
-    clearAll: document.getElementById('clear-all-pagos'),
-    clearSelected: document.getElementById('clear-selected-pagos'),
-    printSelected: document.getElementById('print-selected-pagos'),
-    columnsToggle: document.getElementById('columns-toggle-pagos'),
-    columnsDropdown: document.getElementById('columns-dropdown-pagos'),
-};
+const ROW_STYLES = [
+    { field: 'tipoComprobanteDesc', value: 'Egreso', className: 'row--egreso' },
+    { field: 'tipoComprobanteDesc', value: 'Pago', className: 'row--pago' },
+];
 
-const pagosGrid = createGrid({
-    columns: PAGOS_COLUMNS,
-    container: tabContents.pagos,
-    headId: 'grid-head-pagos',
-    bodyId: 'grid-body-pagos',
+const ROW_COLORS = [
+    { field: 'tipoComprobanteDesc', value: 'Egreso', rgb: 'FF0000' },
+    { field: 'tipoComprobanteDesc', value: 'Pago', rgb: '0000FF' },
+];
+
+const grid = createGrid({
+    columns: COLUMNS,
+    container: document.getElementById('app'),
+    headId: 'grid-head',
+    bodyId: 'grid-body',
+    rowStyles: ROW_STYLES,
     onFilterChange: (visible, total) => {
-        pagosUI.statusText.textContent = `Mostrando ${visible} de ${total} filas`;
-        pagosUI.rowCount.textContent = `${total} filas cargadas`;
-        pagosUI.exportFiltered.disabled = visible === 0;
+        statusText.textContent = `Mostrando ${visible} de ${total} filas`;
+        rowCount.textContent = `${total} filas cargadas`;
+        exportFilteredBtn.disabled = visible === 0;
     },
     onSelectionChange: (count) => {
-        pagosUI.clearSelected.disabled = count === 0;
-        pagosUI.exportSelected.disabled = count === 0;
-        pagosUI.printSelected.disabled = count === 0;
-        pagosUI.clearSelected.textContent = count > 0 ? `Quitar Seleccionados (${count})` : 'Quitar Seleccionados';
-        pagosUI.exportSelected.textContent = count > 0 ? `Exportar Seleccionados (${count})` : 'Exportar Seleccionados';
-        pagosUI.printSelected.textContent = count > 0 ? `Imprimir Seleccionados (${count})` : 'Imprimir Seleccionados';
+        clearSelectedBtn.disabled = count === 0;
+        exportSelectedBtn.disabled = count === 0;
+        printSelectedBtn.disabled = count === 0;
+        clearSelectedBtn.textContent = count > 0 ? `Quitar Seleccionados (${count})` : 'Quitar Seleccionados';
+        exportSelectedBtn.textContent = count > 0 ? `Exportar Seleccionados (${count})` : 'Exportar Seleccionados';
+        printSelectedBtn.textContent = count > 0 ? `Imprimir Seleccionados (${count})` : 'Imprimir Seleccionados';
     },
-    onPdfClick: (uuid) => generateAndDownloadPDF(uuid, pagosGrid.getXmlStore(), parsePagoCFDIForPrint, generatePagoPdf),
+    onPdfClick: (uuid) => {
+        const xmlStore = grid.getXmlStore();
+        const xml = xmlStore.get(uuid);
+        if (!xml) return;
+        const tipo = detectTipoComprobante(xml);
+        if (tipo === 'P') {
+            generateAndDownloadPDF(uuid, xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
+        } else {
+            generateAndDownloadPDF(uuid, xmlStore, parseCFDIForPrint, generateCFDIPdf);
+        }
+    },
 });
 
 // ============================================================
-// Wire up toolbar buttons for both tabs
+// Toolbar buttons
 // ============================================================
-function wireToolbar(ui, grid, printParser, pdfGenerator, egresoKey) {
-    ui.exportAll.addEventListener('click', () => {
-        exportToXlsx(grid.getAllRows(), grid.getColumns(), egresoKey);
-    });
+exportAllBtn.addEventListener('click', () => {
+    exportToXlsx(grid.getAllRows(), grid.getColumns(), ROW_COLORS);
+});
 
-    ui.exportFiltered.addEventListener('click', () => {
-        exportToXlsx(grid.getVisibleRows(), grid.getColumns(), egresoKey, grid.getColumnVisibility());
-    });
+exportFilteredBtn.addEventListener('click', () => {
+    exportToXlsx(grid.getVisibleRows(), grid.getColumns(), ROW_COLORS, grid.getColumnVisibility());
+});
 
-    ui.exportSelected.addEventListener('click', () => {
-        exportToXlsx(grid.getSelectedRows(), grid.getColumns(), egresoKey);
-    });
+exportSelectedBtn.addEventListener('click', () => {
+    exportToXlsx(grid.getSelectedRows(), grid.getColumns(), ROW_COLORS);
+});
 
-    ui.clearAll.addEventListener('click', async () => {
-        const total = grid.getAllRows().length;
-        if (!await showConfirm(`¿Estás seguro de quitar las ${total} filas cargadas?`)) return;
-        grid.clearData();
-        ui.toolbar.hidden = true;
-        ui.gridContainer.hidden = true;
-        ui.statusBar.hidden = true;
-    });
+clearAllBtn.addEventListener('click', async () => {
+    const total = grid.getAllRows().length;
+    if (!await showConfirm(`¿Estás seguro de quitar las ${total} filas cargadas?`)) return;
+    grid.clearData();
+    toolbar.hidden = true;
+    gridContainer.hidden = true;
+    statusBar.hidden = true;
+});
 
-    ui.clearSelected.addEventListener('click', async () => {
-        const count = grid.getSelectedRows().length;
-        if (!await showConfirm(`¿Estás seguro de quitar ${count} fila${count !== 1 ? 's' : ''} seleccionada${count !== 1 ? 's' : ''}?`)) return;
-        grid.removeSelectedRows();
-        if (grid.getAllRows().length === 0) {
-            ui.toolbar.hidden = true;
-            ui.gridContainer.hidden = true;
-            ui.statusBar.hidden = true;
-        }
-    });
+clearSelectedBtn.addEventListener('click', async () => {
+    const count = grid.getSelectedRows().length;
+    if (!await showConfirm(`¿Estás seguro de quitar ${count} fila${count !== 1 ? 's' : ''} seleccionada${count !== 1 ? 's' : ''}?`)) return;
+    grid.removeSelectedRows();
+    if (grid.getAllRows().length === 0) {
+        toolbar.hidden = true;
+        gridContainer.hidden = true;
+        statusBar.hidden = true;
+    }
+});
 
-    ui.printSelected.addEventListener('click', () => {
-        generateAndDownloadSelectedPDFs(grid, printParser, pdfGenerator);
-    });
+printSelectedBtn.addEventListener('click', () => {
+    generateAndDownloadSelectedPDFs();
+});
 
-    // Column visibility
-    ui.columnsToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        ui.columnsDropdown.hidden = !ui.columnsDropdown.hidden;
-        if (!ui.columnsDropdown.hidden) {
-            buildColumnsDropdown(ui.columnsDropdown, grid);
-        }
-    });
-
-    ui.columnsDropdown.addEventListener('click', (e) => e.stopPropagation());
-}
-
-function buildColumnsDropdown(dropdown, grid) {
-    const vis = grid.getColumnVisibility();
-    dropdown.innerHTML = '';
-    grid.getColumns().forEach(col => {
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = vis[col.key];
-        checkbox.addEventListener('change', () => {
-            grid.setColumnVisibility(col.key, checkbox.checked);
+// Column visibility
+columnsToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    columnsDropdown.hidden = !columnsDropdown.hidden;
+    if (!columnsDropdown.hidden) {
+        const vis = grid.getColumnVisibility();
+        columnsDropdown.innerHTML = '';
+        grid.getColumns().forEach(col => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = vis[col.key];
+            checkbox.addEventListener('change', () => {
+                grid.setColumnVisibility(col.key, checkbox.checked);
+            });
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(col.label));
+            columnsDropdown.appendChild(label);
         });
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(col.label));
-        dropdown.appendChild(label);
-    });
-}
-
-wireToolbar(facturasUI, facturasGrid, parseCFDIForPrint, generateCFDIPdf, 'tipoComprobanteDesc');
-wireToolbar(pagosUI, pagosGrid, parsePagoCFDIForPrint, generatePagoPdf, null);
-
-// Close dropdowns on outside click
-document.addEventListener('click', () => {
-    facturasUI.columnsDropdown.hidden = true;
-    pagosUI.columnsDropdown.hidden = true;
+    }
 });
+
+columnsDropdown.addEventListener('click', (e) => e.stopPropagation());
+document.addEventListener('click', () => { columnsDropdown.hidden = true; });
 
 // ============================================================
 // File input
@@ -335,8 +266,7 @@ dropZone.addEventListener('click', (e) => {
 parseBtn.addEventListener('click', () => {
     const xml = pasteInput.value.trim();
     if (!xml) return;
-    const tab = processXML(xml, 'pasted-xml');
-    if (tab && tab !== 'error') switchTab(tab);
+    processXML(xml, 'pasted-xml');
     pasteInput.value = '';
 });
 
@@ -360,85 +290,61 @@ function processXML(xmlString, filename) {
     const tipo = detectTipoComprobante(xmlString);
 
     if (tipo === 'P') {
-        // Pago
         const result = parsePagoCFDI(xmlString, filename);
         if (!result) {
             showWarning(`No se pudo parsear: ${filename}`);
-            return 'error';
+            return;
         }
         if (result.error === 'pagos10_unsupported') {
             showWarning(`${filename}: Complemento de Pagos 1.0 no soportado. Solo se soporta Pagos 2.0 (CFDI 4.0).`);
-            return 'error';
+            return;
         }
         if (result.error) {
             showWarning(`${filename}: ${result.error}`);
-            return 'error';
+            return;
         }
         if (result.rows && result.rows.length > 0) {
-            addPagosRows(result.rows, result.uuid, xmlString);
+            addRows(result.rows, result.uuid, xmlString);
         }
-        return 'pagos';
     } else {
-        // Facturas (I, E, T, N)
         const result = parseCFDI(xmlString, filename);
         if (result && result.error) {
             showWarning(`${filename}: versión CFDI no soportada (${result.version})`);
-            return 'error';
+            return;
         }
         if (result) {
-            addFacturasRows([result], xmlString);
-            return 'facturas';
+            addRows([result], result.uuid, xmlString);
+        } else {
+            showWarning(`No se pudo parsear: ${filename}`);
         }
-        showWarning(`No se pudo parsear: ${filename}`);
-        return 'error';
     }
 }
 
 async function handleFiles(files) {
-    let lastTab = null;
     for (const file of files) {
         const text = await readFile(file);
-        const tab = processXML(text, file.name);
-        if (tab && tab !== 'error') lastTab = tab;
+        processXML(text, file.name);
     }
-    if (lastTab) switchTab(lastTab);
 }
 
 // ============================================================
-// Add rows to grids
+// Add rows to grid
 // ============================================================
-function addFacturasRows(newRows, xmlString) {
-    const existing = facturasGrid.getAllRows();
+function addRows(newRows, uuid, xmlString) {
+    const existing = grid.getAllRows();
     const existingUUIDs = new Set(existing.map(r => r.uuid).filter(Boolean));
-    const unique = newRows.filter(r => !r.uuid || !existingUUIDs.has(r.uuid));
 
-    if (unique.length === 0) {
+    // Dedup at XML level by Comprobante UUID
+    if (uuid && existingUUIDs.has(uuid)) {
         showWarning('Todos los archivos ya están cargados (UUID duplicado).');
         return;
     }
 
-    unique.forEach(r => facturasGrid.getXmlStore().set(r.uuid, xmlString));
-    facturasGrid.setData([...existing, ...unique]);
-    facturasUI.toolbar.hidden = false;
-    facturasUI.gridContainer.hidden = false;
-    facturasUI.statusBar.hidden = false;
-}
-
-function addPagosRows(newRows, uuid, xmlString) {
-    const existing = pagosGrid.getAllRows();
-    const existingUUIDs = new Set(existing.map(r => r.uuid).filter(Boolean));
-
-    // Dedup at XML level (by Comprobante UUID)
-    if (existingUUIDs.has(uuid)) {
-        showWarning('Todos los archivos ya están cargados (UUID duplicado).');
-        return;
-    }
-
-    pagosGrid.getXmlStore().set(uuid, xmlString);
-    pagosGrid.setData([...existing, ...newRows]);
-    pagosUI.toolbar.hidden = false;
-    pagosUI.gridContainer.hidden = false;
-    pagosUI.statusBar.hidden = false;
+    if (uuid) grid.getXmlStore().set(uuid, xmlString);
+    grid.setData([...existing, ...newRows]);
+    toolbar.hidden = false;
+    gridContainer.hidden = false;
+    statusBar.hidden = false;
 }
 
 // ============================================================
@@ -468,23 +374,36 @@ function generateAndDownloadPDF(uuid, xmlStore, printParser, pdfGenerator) {
     if (blob) downloadBlob(blob, uuid + '.pdf');
 }
 
-async function generateAndDownloadSelectedPDFs(grid, printParser, pdfGenerator) {
+async function generateAndDownloadSelectedPDFs() {
     const selected = grid.getSelectedRows();
     if (selected.length === 0) return;
 
     const xmlStore = grid.getXmlStore();
 
-    // Deduplicate by UUID (multiple rows may share same UUID in Pagos)
+    // Deduplicate by UUID (Pagos rows share UUID)
     const uniqueUuids = [...new Set(selected.map(r => r.uuid).filter(Boolean))];
 
     if (uniqueUuids.length === 1) {
-        generateAndDownloadPDF(uniqueUuids[0], xmlStore, printParser, pdfGenerator);
+        const xml = xmlStore.get(uniqueUuids[0]);
+        const tipo = detectTipoComprobante(xml);
+        if (tipo === 'P') {
+            generateAndDownloadPDF(uniqueUuids[0], xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
+        } else {
+            generateAndDownloadPDF(uniqueUuids[0], xmlStore, parseCFDIForPrint, generateCFDIPdf);
+        }
         return;
     }
 
     const zip = new JSZip();
     for (const uuid of uniqueUuids) {
-        const blob = generatePDFBlob(uuid, xmlStore, printParser, pdfGenerator);
+        const xml = xmlStore.get(uuid);
+        const tipo = detectTipoComprobante(xml);
+        let blob;
+        if (tipo === 'P') {
+            blob = generatePDFBlob(uuid, xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
+        } else {
+            blob = generatePDFBlob(uuid, xmlStore, parseCFDIForPrint, generateCFDIPdf);
+        }
         if (blob) zip.file(uuid + '.pdf', blob);
     }
     const zipBlob = await zip.generateAsync({ type: 'blob' });

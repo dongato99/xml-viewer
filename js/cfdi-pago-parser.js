@@ -83,7 +83,7 @@ export function parsePagoCFDI(xmlString, filename) {
                 fechaPago,
                 _fechaPagoRaw: fechaPagoRaw,
                 formaPagoP,
-                formaPagoDesc: lookupFormaPago(formaPagoP),
+                formaPagoPagoDesc: lookupFormaPago(formaPagoP),
                 monedaP,
                 montoPago,
                 numOperacion,
@@ -106,6 +106,7 @@ export function parsePagoCFDI(xmlString, filename) {
                 folio,
                 fechaComprobante,
                 _fechaComprobanteRaw: fechaComprobanteRaw,
+                tipoComprobanteDesc: 'Pago',
                 _filename: filename,
             });
         }

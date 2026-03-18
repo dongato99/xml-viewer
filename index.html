@@ -15,11 +15,6 @@
             </button>
         </header>
 
-        <nav class="tabs" id="tabs">
-            <button class="tabs__btn tabs__btn--active" data-tab="facturas">Facturas</button>
-            <button class="tabs__btn" data-tab="pagos">Pagos</button>
-        </nav>
-
         <section class="input-area">
             <div class="input-area__drop-zone" id="drop-zone">
                 <p class="drop-zone__text">Arrastra archivos XML aquí</p>
@@ -36,73 +31,36 @@
             </div>
         </section>
 
-        <!-- Facturas Tab -->
-        <div id="tab-facturas" class="tab-content tab-content--active">
-            <section class="toolbar" id="toolbar-facturas" hidden>
-                <div class="toolbar__left">
-                    <span id="row-count-facturas" class="toolbar__count"></span>
-                    <div class="toolbar__columns">
-                        <button id="columns-toggle-facturas" class="toolbar__btn">Filtrar Columnas</button>
-                        <div id="columns-dropdown-facturas" class="toolbar__dropdown" hidden></div>
-                    </div>
+        <section class="toolbar" id="toolbar" hidden>
+            <div class="toolbar__left">
+                <span id="row-count" class="toolbar__count"></span>
+                <div class="toolbar__columns">
+                    <button id="columns-toggle" class="toolbar__btn">Filtrar Columnas</button>
+                    <div id="columns-dropdown" class="toolbar__dropdown" hidden></div>
                 </div>
-                <div class="toolbar__right">
-                    <button id="clear-selected-facturas" class="toolbar__btn toolbar__btn--danger" disabled>Quitar Seleccionados</button>
-                    <button id="clear-all-facturas" class="toolbar__btn toolbar__btn--danger">Quitar Todo</button>
-                    <button id="export-selected-facturas" class="toolbar__btn toolbar__btn--primary" disabled>Exportar Seleccionados</button>
-                    <button id="export-all-facturas" class="toolbar__btn toolbar__btn--primary">Exportar Todo</button>
-                    <button id="export-filtered-facturas" class="toolbar__btn toolbar__btn--primary">Exportar Filtrado</button>
-                    <button id="print-selected-facturas" class="toolbar__btn toolbar__btn--primary" disabled>Imprimir Seleccionados</button>
-                </div>
-            </section>
+            </div>
+            <div class="toolbar__right">
+                <button id="clear-selected" class="toolbar__btn toolbar__btn--danger" disabled>Quitar Seleccionados</button>
+                <button id="clear-all" class="toolbar__btn toolbar__btn--danger">Quitar Todo</button>
+                <button id="export-selected" class="toolbar__btn toolbar__btn--primary" disabled>Exportar Seleccionados</button>
+                <button id="export-all" class="toolbar__btn toolbar__btn--primary">Exportar Todo</button>
+                <button id="export-filtered" class="toolbar__btn toolbar__btn--primary">Exportar Filtrado</button>
+                <button id="print-selected" class="toolbar__btn toolbar__btn--primary" disabled>Imprimir Seleccionados</button>
+            </div>
+        </section>
 
-            <section id="grid-container-facturas" class="grid-container" hidden>
-                <div class="grid-wrapper">
-                    <table id="data-grid-facturas" class="data-grid">
-                        <thead id="grid-head-facturas"></thead>
-                        <tbody id="grid-body-facturas"></tbody>
-                    </table>
-                </div>
-            </section>
+        <section id="grid-container" class="grid-container" hidden>
+            <div class="grid-wrapper">
+                <table id="data-grid" class="data-grid">
+                    <thead id="grid-head"></thead>
+                    <tbody id="grid-body"></tbody>
+                </table>
+            </div>
+        </section>
 
-            <footer id="status-bar-facturas" class="status-bar" hidden>
-                <span id="status-text-facturas"></span>
-            </footer>
-        </div>
-
-        <!-- Pagos Tab -->
-        <div id="tab-pagos" class="tab-content">
-            <section class="toolbar" id="toolbar-pagos" hidden>
-                <div class="toolbar__left">
-                    <span id="row-count-pagos" class="toolbar__count"></span>
-                    <div class="toolbar__columns">
-                        <button id="columns-toggle-pagos" class="toolbar__btn">Filtrar Columnas</button>
-                        <div id="columns-dropdown-pagos" class="toolbar__dropdown" hidden></div>
-                    </div>
-                </div>
-                <div class="toolbar__right">
-                    <button id="clear-selected-pagos" class="toolbar__btn toolbar__btn--danger" disabled>Quitar Seleccionados</button>
-                    <button id="clear-all-pagos" class="toolbar__btn toolbar__btn--danger">Quitar Todo</button>
-                    <button id="export-selected-pagos" class="toolbar__btn toolbar__btn--primary" disabled>Exportar Seleccionados</button>
-                    <button id="export-all-pagos" class="toolbar__btn toolbar__btn--primary">Exportar Todo</button>
-                    <button id="export-filtered-pagos" class="toolbar__btn toolbar__btn--primary">Exportar Filtrado</button>
-                    <button id="print-selected-pagos" class="toolbar__btn toolbar__btn--primary" disabled>Imprimir Seleccionados</button>
-                </div>
-            </section>
-
-            <section id="grid-container-pagos" class="grid-container" hidden>
-                <div class="grid-wrapper">
-                    <table id="data-grid-pagos" class="data-grid">
-                        <thead id="grid-head-pagos"></thead>
-                        <tbody id="grid-body-pagos"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <footer id="status-bar-pagos" class="status-bar" hidden>
-                <span id="status-text-pagos"></span>
-            </footer>
-        </div>
+        <footer id="status-bar" class="status-bar" hidden>
+            <span id="status-text"></span>
+        </footer>
 
         <div id="warnings" class="warnings" hidden></div>
 
@@ -119,6 +77,6 @@
     <script src="lib/qrcode.min.js"></script>
     <script src="lib/jszip.min.js"></script>
     <script src="lib/xlsx.full.min.js"></script>
-    <script type="module" src="js/app.js?v=2.2"></script>
+    <script type="module" src="js/app.js?v=2.3"></script>
 </body>
 </html>

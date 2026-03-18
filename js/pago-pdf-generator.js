@@ -201,14 +201,14 @@ export function generatePagoPdf(data) {
         y = drawSimpleTable(doc, y, conceptCols, [vals]);
 
         // Description row
-        const descText = 'Descripción    ' + (c.descripcion || '');
         doc.setFontSize(SMALL_FONT);
-        doc.setFont('helvetica', 'italic');
-        const wrappedDesc = doc.splitTextToSize(descText, CONTENT_W - 4);
-        const descRowH = wrappedDesc.length * 2.5 + 2;
+        const descRowH = 4;
         doc.rect(MARGIN, y, CONTENT_W, descRowH);
-        doc.text(wrappedDesc, MARGIN + 2, y + 2.8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Descripción', MARGIN + 2, y + 2.8);
         doc.setFont('helvetica', 'normal');
+        const descLabelW = doc.getTextWidth('Descripción') + 4;
+        doc.text(c.descripcion || '', MARGIN + descLabelW, y + 2.8);
         y += descRowH;
 
         // Número de pedimento / Cuenta predial row
@@ -286,7 +286,11 @@ export function generatePagoPdf(data) {
 
         // SECTION 5: Impuestos del Pago
         if (pago.trasladosP && pago.trasladosP.length > 0) {
-            y = drawSectionTitle(doc, y, 'Impuestos del Pago — Traslados');
+            y = drawSectionTitle(doc, y, 'Impuestos del Pago');
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Traslados del Pago', MARGIN, y);
+            y += 4;
 
             const taxCols = [
                 { label: 'Base', w: 35, align: 'right' },
@@ -332,7 +336,11 @@ export function generatePagoPdf(data) {
 
             // SECTION 7: Impuestos del Documento Relacionado
             if (dr.trasladosDR && dr.trasladosDR.length > 0) {
-                y = drawSectionTitle(doc, y, 'Impuestos del Documento Relacionado — Traslados');
+                y = drawSectionTitle(doc, y, 'Impuestos del Documento Relacionado');
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Traslados del Documento Relacionado', MARGIN, y);
+                y += 4;
 
                 const drTaxCols = [
                     { label: 'Base', w: 35, align: 'right' },

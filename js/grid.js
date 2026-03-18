@@ -86,6 +86,10 @@ export function createGrid(config) {
         const pdfTh = document.createElement('th');
         pdfTh.className = 'pdf-col';
         pdfTh.style.cursor = 'default';
+        pdfTh.classList.add('frozen-col');
+        pdfTh.style.position = 'sticky';
+        pdfTh.style.left = '0px';
+        pdfTh.style.zIndex = '12';
         headerRow.appendChild(pdfTh);
 
         const selectAllTh = document.createElement('th');
@@ -104,12 +108,22 @@ export function createGrid(config) {
             fireSelectionChange();
         });
         selectAllTh.appendChild(selectAllCb);
+        selectAllTh.classList.add('frozen-col');
+        selectAllTh.style.position = 'sticky';
+        selectAllTh.style.left = '50px';
+        selectAllTh.style.zIndex = '12';
         headerRow.appendChild(selectAllTh);
 
-        columns.forEach(col => {
+        columns.forEach((col, i) => {
             const th = document.createElement('th');
             th.dataset.key = col.key;
             th.innerHTML = `${col.label}<span class="sort-indicator"></span>`;
+            if (i === 0) {
+                th.classList.add('frozen-col');
+                th.style.position = 'sticky';
+                th.style.left = '90px';
+                th.style.zIndex = '12';
+            }
             th.addEventListener('click', () => {
                 if (sortState.column === col.key) {
                     sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
@@ -131,14 +145,28 @@ export function createGrid(config) {
 
         const filterPdfTh = document.createElement('th');
         filterPdfTh.className = 'pdf-col';
+        filterPdfTh.classList.add('frozen-col');
+        filterPdfTh.style.position = 'sticky';
+        filterPdfTh.style.left = '0px';
+        filterPdfTh.style.zIndex = '11';
         filterRow.appendChild(filterPdfTh);
 
         const filterSelectTh = document.createElement('th');
         filterSelectTh.className = 'select-col';
+        filterSelectTh.classList.add('frozen-col');
+        filterSelectTh.style.position = 'sticky';
+        filterSelectTh.style.left = '50px';
+        filterSelectTh.style.zIndex = '11';
         filterRow.appendChild(filterSelectTh);
 
-        columns.forEach(col => {
+        columns.forEach((col, i) => {
             const th = document.createElement('th');
+            if (i === 0) {
+                th.classList.add('frozen-col');
+                th.style.position = 'sticky';
+                th.style.left = '90px';
+                th.style.zIndex = '11';
+            }
             const input = document.createElement('input');
             input.type = 'text';
             input.placeholder = col.type === 'numeric' ? 'Ej: >1000' : 'Filtrar...';
@@ -247,6 +275,10 @@ export function createGrid(config) {
                 if (onPdfClick) onPdfClick(row.uuid);
             });
             pdfTd.appendChild(pdfBtn);
+            pdfTd.classList.add('frozen-col');
+            pdfTd.style.position = 'sticky';
+            pdfTd.style.left = '0px';
+            pdfTd.style.zIndex = '5';
             tr.appendChild(pdfTd);
 
             const selectTd = document.createElement('td');
@@ -264,10 +296,21 @@ export function createGrid(config) {
                 fireSelectionChange();
             });
             selectTd.appendChild(cb);
+            selectTd.classList.add('frozen-col');
+            selectTd.style.position = 'sticky';
+            selectTd.style.left = '50px';
+            selectTd.style.zIndex = '5';
             tr.appendChild(selectTd);
 
-            columns.forEach(col => {
+            columns.forEach((col, i) => {
                 const td = document.createElement('td');
+                td.dataset.key = col.key;
+                if (i === 0) {
+                    td.classList.add('frozen-col');
+                    td.style.position = 'sticky';
+                    td.style.left = '90px';
+                    td.style.zIndex = '5';
+                }
                 if (!columnVisibility[col.key]) td.hidden = true;
                 const val = row[col.key];
                 if (col.type === 'numeric' && val !== null && val !== undefined) {

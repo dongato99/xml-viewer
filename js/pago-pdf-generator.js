@@ -269,8 +269,7 @@ export function generatePagoPdf(data) {
 
         // SECTION 5: Impuestos del Pago
         if (pago.trasladosP && pago.trasladosP.length > 0) {
-            y = drawSectionTitle(doc, y, 'Impuestos del Pago');
-            y = drawSectionTitle(doc, y - 4, 'Traslados del Pago');
+            y = drawSectionTitle(doc, y, 'Impuestos del Pago — Traslados');
 
             const taxCols = [
                 { label: 'Base', w: 35, align: 'right' },
@@ -316,8 +315,7 @@ export function generatePagoPdf(data) {
 
             // SECTION 7: Impuestos del Documento Relacionado
             if (dr.trasladosDR && dr.trasladosDR.length > 0) {
-                y = drawSectionTitle(doc, y, 'Impuestos del Documento Relacionado');
-                y = drawSectionTitle(doc, y - 4, 'Traslados del Documento Relacionado');
+                y = drawSectionTitle(doc, y, 'Impuestos del Documento Relacionado — Traslados');
 
                 const drTaxCols = [
                     { label: 'Base', w: 35, align: 'right' },

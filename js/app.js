@@ -232,7 +232,7 @@ function wireToolbar(ui, grid, printParser, pdfGenerator, egresoKey) {
     });
 
     ui.exportFiltered.addEventListener('click', () => {
-        exportToXlsx(grid.getVisibleRows(), grid.getColumns(), egresoKey);
+        exportToXlsx(grid.getVisibleRows(), grid.getColumns(), egresoKey, grid.getColumnVisibility());
     });
 
     ui.exportSelected.addEventListener('click', () => {

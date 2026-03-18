@@ -226,17 +226,17 @@ const pagosGrid = createGrid({
 // ============================================================
 // Wire up toolbar buttons for both tabs
 // ============================================================
-function wireToolbar(ui, grid, printParser, pdfGenerator) {
+function wireToolbar(ui, grid, printParser, pdfGenerator, egresoKey) {
     ui.exportAll.addEventListener('click', () => {
-        exportToXlsx(grid.getAllRows(), grid.getColumns());
+        exportToXlsx(grid.getAllRows(), grid.getColumns(), egresoKey);
     });
 
     ui.exportFiltered.addEventListener('click', () => {
-        exportToXlsx(grid.getVisibleRows(), grid.getColumns());
+        exportToXlsx(grid.getVisibleRows(), grid.getColumns(), egresoKey);
     });
 
     ui.exportSelected.addEventListener('click', () => {
-        exportToXlsx(grid.getSelectedRows(), grid.getColumns());
+        exportToXlsx(grid.getSelectedRows(), grid.getColumns(), egresoKey);
     });
 
     ui.clearAll.addEventListener('click', async () => {
@@ -292,8 +292,8 @@ function buildColumnsDropdown(dropdown, grid) {
     });
 }
 
-wireToolbar(facturasUI, facturasGrid, parseCFDIForPrint, generateCFDIPdf);
-wireToolbar(pagosUI, pagosGrid, parsePagoCFDIForPrint, generatePagoPdf);
+wireToolbar(facturasUI, facturasGrid, parseCFDIForPrint, generateCFDIPdf, 'tipoComprobanteDesc');
+wireToolbar(pagosUI, pagosGrid, parsePagoCFDIForPrint, generatePagoPdf, null);
 
 // Close dropdowns on outside click
 document.addEventListener('click', () => {

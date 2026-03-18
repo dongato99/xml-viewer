@@ -377,8 +377,8 @@ body {
 
 .data-grid {
     width: 100%;
-    border-collapse: collapse !important;
-    border-spacing: 0 !important;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 0.85rem;
 }
 

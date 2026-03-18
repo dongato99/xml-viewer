@@ -335,7 +335,8 @@ dropZone.addEventListener('click', (e) => {
 parseBtn.addEventListener('click', () => {
     const xml = pasteInput.value.trim();
     if (!xml) return;
-    processXML(xml, 'pasted-xml');
+    const tab = processXML(xml, 'pasted-xml');
+    if (tab && tab !== 'error') switchTab(tab);
     pasteInput.value = '';
 });
 

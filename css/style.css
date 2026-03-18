@@ -643,6 +643,38 @@ td.frozen-col[data-key="rfcEmisor"] {
     td.frozen-col[data-key="rfcEmisor"] {
         max-width: 70px;
     }
+    .data-grid {
+        font-size: 0.8rem;
+    }
+    .data-grid td {
+        padding: 6px 8px;
+    }
+    .data-grid th {
+        padding: 8px;
+    }
+    .data-grid .filter-row th {
+        top: 34px;
+    }
+    .data-grid .filter-row input {
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
+    .select-col input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+    .select-col {
+        padding: 12px 8px;
+        min-height: 44px;
+    }
+    .toolbar__btn {
+        min-height: 44px;
+        font-size: 0.8rem;
+    }
+    .pdf-btn {
+        min-height: 36px;
+        padding: 6px 12px;
+    }
 }
 
 @media (min-width: 576px) and (max-width: 991.98px) {

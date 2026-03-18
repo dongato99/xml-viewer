@@ -228,15 +228,15 @@ const pagosGrid = createGrid({
 // ============================================================
 function wireToolbar(ui, grid, printParser, pdfGenerator) {
     ui.exportAll.addEventListener('click', () => {
-        exportToXlsx(grid.getAllRows(), grid.getColumns(), grid.getSortState());
+        exportToXlsx(grid.getAllRows(), grid.getColumns());
     });
 
     ui.exportFiltered.addEventListener('click', () => {
-        exportToXlsx(grid.getVisibleRows(), grid.getColumns(), grid.getSortState());
+        exportToXlsx(grid.getVisibleRows(), grid.getColumns());
     });
 
     ui.exportSelected.addEventListener('click', () => {
-        exportToXlsx(grid.getSelectedRows(), grid.getColumns(), grid.getSortState());
+        exportToXlsx(grid.getSelectedRows(), grid.getColumns());
     });
 
     ui.clearAll.addEventListener('click', async () => {

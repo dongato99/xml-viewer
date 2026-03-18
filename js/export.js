@@ -8,19 +8,12 @@ const HOJA1_KEYS = [
     'moneda', 'total', 'estatus', 'uuid', 'validez', 'tipoComprobanteDesc'
 ];
 
-export function exportToXlsx(rows, columns, sortState) {
+export function exportToXlsx(rows, columns) {
     if (!rows || rows.length === 0) return;
 
     const wb = XLSX.utils.book_new();
 
-    const sheet0Headers = columns.map(col => {
-        let label = col.label;
-        if (sortState && sortState.column === col.key) {
-            const arrow = sortState.direction === 'asc' ? '▲' : '▼';
-            label = `${arrow} ${label}`;
-        }
-        return label;
-    });
+    const sheet0Headers = columns.map(col => col.label);
 
     const sheet0Data = rows.map(row =>
         columns.map(col => {

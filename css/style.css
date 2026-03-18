@@ -377,15 +377,18 @@ body {
 
 .data-grid {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
     font-size: 0.85rem;
 }
 
+/* Override Bootstrap Reboot which sets border-style:solid on all table elements */
 .data-grid thead,
 .data-grid tbody,
-.data-grid tr {
-    border: none;
+.data-grid tfoot,
+.data-grid tr,
+.data-grid th,
+.data-grid td {
+    border: 0 none;
 }
 
 .data-grid th {

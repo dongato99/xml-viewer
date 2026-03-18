@@ -84,11 +84,12 @@ initTheme();
 // Unified Grid — all columns for both Facturas and Pagos
 // ============================================================
 const COLUMNS = [
+    // Frozen column (first data column for sticky positioning)
+    { key: 'rfcEmisor', label: 'RFC Emisor', type: 'text' },
     // Shared
     { key: 'fechaComprobante', label: 'Fecha Comprobante', type: 'text', rawKey: '_fechaRaw' },
     { key: 'serie', label: 'Serie', type: 'text' },
     { key: 'folio', label: 'Folio', type: 'text' },
-    { key: 'rfcEmisor', label: 'RFC Emisor', type: 'text' },
     { key: 'nombreEmisor', label: 'Nombre Emisor', type: 'text' },
     { key: 'uuid', label: 'UUID', type: 'text' },
     { key: 'tipoComprobanteDesc', label: 'Tipo Comprobante', type: 'text' },
@@ -216,7 +217,8 @@ columnsToggle.addEventListener('click', (e) => {
     if (!columnsDropdown.hidden) {
         const vis = grid.getColumnVisibility();
         columnsDropdown.innerHTML = '';
-        grid.getColumns().forEach(col => {
+        const FROZEN_KEYS = ['rfcEmisor'];
+        grid.getColumns().filter(col => !FROZEN_KEYS.includes(col.key)).forEach(col => {
             const label = document.createElement('label');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';

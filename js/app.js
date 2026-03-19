@@ -416,21 +416,6 @@ async function generateAndDownloadSelectedPDFs() {
     const dateStr = now.toISOString().slice(0, 10);
     const filename = `CFDIs_${dateStr}.zip`;
 
-    if (window.showSaveFilePicker) {
-        try {
-            const handle = await window.showSaveFilePicker({
-                suggestedName: filename,
-                types: [{ description: 'ZIP', accept: { 'application/zip': ['.zip'] } }],
-            });
-            const writable = await handle.createWritable();
-            await writable.write(zipBlob);
-            await writable.close();
-            return;
-        } catch (e) {
-            if (e.name === 'AbortError') return;
-        }
-    }
-
     downloadBlob(zipBlob, filename);
 }
 

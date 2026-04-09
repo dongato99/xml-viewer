@@ -99,6 +99,8 @@ export function parseCFDI(xmlString, filename) {
         folio: attr(comprobante, 'Folio'),
         rfcEmisor: attr(emisor, 'Rfc'),
         nombreEmisor: attr(emisor, 'Nombre'),
+        rfcReceptor: attr(receptor, 'Rfc'),
+        nombreReceptor: attr(receptor, 'Nombre'),
         moneda,
         tipoCambio,
         baseTraslado,

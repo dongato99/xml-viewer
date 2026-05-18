@@ -454,5 +454,39 @@ export function generateNominaPdf(data) {
         }
     }
 
+    // ============================================================
+    // 12. Totales Nómina (3-col summary)
+    // ============================================================
+    y = drawSectionTitle(doc, y, 'Totales Nómina');
+    const totColsNom = [
+        { label: 'Total percepciones', w: CONTENT_W / 3, align: 'right' },
+        { label: 'Total otros pagos', w: CONTENT_W / 3, align: 'right' },
+        { label: 'Total deducciones', w: CONTENT_W / 3, align: 'right' },
+    ];
+    y = drawDataTable(doc, y, totColsNom, [[
+        fmtMoney(data.nomina?.totalPercepciones),
+        fmtMoney(data.nomina?.totalOtrosPagos),
+        fmtMoney(data.nomina?.totalDeducciones),
+    ]]);
+
+    y += SECTION_GAP;
+
+    // ============================================================
+    // 13. IMPORTE NETO (highlighted line, right-aligned)
+    // ============================================================
+    y = ensureSpace(doc, y, 8);
+    doc.setDrawColor(0, 0, 0);
+    doc.line(MARGIN, y, MARGIN + CONTENT_W, y);
+    y += 4;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text('IMPORTE NETO', MARGIN, y);
+    doc.setFontSize(10);
+    doc.text('$ ' + fmtMoney(data.nomina?.importeNeto || 0), MARGIN + CONTENT_W, y, { align: 'right' });
+    y += 2;
+    doc.setDrawColor(0, 0, 0);
+    doc.line(MARGIN, y, MARGIN + CONTENT_W, y);
+    y += SECTION_GAP;
+
     return doc.output('blob');
 }

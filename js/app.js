@@ -128,6 +128,15 @@ const COLUMNS = [
     { key: 'impSaldoInsoluto', label: 'Saldo Insoluto', type: 'numeric' },
     { key: 'baseDR', label: 'Base IVA DR', type: 'numeric' },
     { key: 'importeDR', label: 'Importe IVA DR', type: 'numeric' },
+    // Nómina
+    { key: 'registroPatronal', label: 'Registro Patronal', type: 'text' },
+    { key: 'periodicidadPago', label: 'Tipo Periodo', type: 'text' },
+    { key: 'departamento', label: 'Departamento', type: 'text' },
+    { key: 'numEmpleado', label: 'Código Empleado', type: 'text' },
+    { key: 'numSeguridadSocial', label: 'NSS', type: 'text' },
+    { key: 'totalPercepciones', label: 'Total Percepciones', type: 'numeric' },
+    { key: 'totalOtrasDeducciones', label: 'Total Otras Deducciones', type: 'numeric' },
+    { key: 'totalImpuestosRetenidos', label: 'Total Impuestos Retenidos', type: 'numeric' },
 ];
 
 const ROW_STYLES = [

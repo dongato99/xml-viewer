@@ -560,5 +560,19 @@ export function generateNominaPdf(data) {
 
     y = Math.max(y + qrSize, certY) + SECTION_GAP;
 
+    // ============================================================
+    // 16. Footer on every page
+    // ============================================================
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+        doc.setPage(p);
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'normal');
+        doc.setDrawColor(180, 180, 180);
+        doc.line(MARGIN, PAGE_H - 12, MARGIN + CONTENT_W, PAGE_H - 12);
+        doc.text('Este documento es una representación impresa de un CFDI', MARGIN, PAGE_H - 8);
+        doc.text(`Página ${p} de ${totalPages}`, MARGIN + CONTENT_W, PAGE_H - 8, { align: 'right' });
+    }
+
     return doc.output('blob');
 }

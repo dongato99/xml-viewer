@@ -3,8 +3,10 @@ import { parseCFDIForPrint } from './cfdi-print-parser.js';
 import { generateCFDIPdf } from './pdf-generator.js';
 import { parsePagoCFDI } from './cfdi-pago-parser.js';
 import { parseNominaCFDI } from './cfdi-nomina-parser.js';
+import { parseNominaCFDIForPrint } from './cfdi-nomina-print-parser.js';
 import { parsePagoCFDIForPrint } from './cfdi-pago-print-parser.js';
 import { generatePagoPdf } from './pago-pdf-generator.js';
+import { generateNominaPdf } from './nomina-pdf-generator.js';
 import { createGrid } from './grid.js';
 import { exportToXlsx } from './export.js';
 
@@ -176,10 +178,8 @@ const grid = createGrid({
         if (!xml) return;
         const tipo = detectTipoComprobante(xml);
         if (tipo === 'N') {
-            showWarning('PDF de Nómina no soportado');
-            return;
-        }
-        if (tipo === 'P') {
+            generateAndDownloadPDF(uuid, xmlStore, parseNominaCFDIForPrint, generateNominaPdf);
+        } else if (tipo === 'P') {
             generateAndDownloadPDF(uuid, xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
         } else {
             generateAndDownloadPDF(uuid, xmlStore, parseCFDIForPrint, generateCFDIPdf);
@@ -418,10 +418,8 @@ async function generateAndDownloadSelectedPDFs() {
         const xml = xmlStore.get(uniqueUuids[0]);
         const tipo = detectTipoComprobante(xml);
         if (tipo === 'N') {
-            showWarning('PDF de Nómina no soportado');
-            return;
-        }
-        if (tipo === 'P') {
+            generateAndDownloadPDF(uniqueUuids[0], xmlStore, parseNominaCFDIForPrint, generateNominaPdf);
+        } else if (tipo === 'P') {
             generateAndDownloadPDF(uniqueUuids[0], xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
         } else {
             generateAndDownloadPDF(uniqueUuids[0], xmlStore, parseCFDIForPrint, generateCFDIPdf);
@@ -430,27 +428,18 @@ async function generateAndDownloadSelectedPDFs() {
     }
 
     const zip = new JSZip();
-    let nominaSkipped = 0;
     for (const uuid of uniqueUuids) {
         const xml = xmlStore.get(uuid);
         const tipo = detectTipoComprobante(xml);
-        if (tipo === 'N') {
-            nominaSkipped++;
-            continue;
-        }
         let blob;
-        if (tipo === 'P') {
+        if (tipo === 'N') {
+            blob = generatePDFBlob(uuid, xmlStore, parseNominaCFDIForPrint, generateNominaPdf);
+        } else if (tipo === 'P') {
             blob = generatePDFBlob(uuid, xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
         } else {
             blob = generatePDFBlob(uuid, xmlStore, parseCFDIForPrint, generateCFDIPdf);
         }
         if (blob) zip.file(uuid + '.pdf', blob);
-    }
-    if (nominaSkipped > 0) {
-        showWarning(`PDF de Nómina no soportado — ${nominaSkipped} fila${nominaSkipped !== 1 ? 's' : ''} omitida${nominaSkipped !== 1 ? 's' : ''}`);
-    }
-    if (nominaSkipped === uniqueUuids.length) {
-        return;
     }
     const zipBlob = await zip.generateAsync({ type: 'blob' });
 

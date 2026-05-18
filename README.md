@@ -28,7 +28,6 @@ Visor web de comprobantes fiscales digitales (CFDI) en formato XML. Permite carg
 - **Scroll horizontal** — Todas las columnas accesibles en cualquier pantalla
 - **Filas alternadas** — Colores alternos para facilitar la lectura
 - **Filas de egreso en rojo** — Los comprobantes de tipo Egreso se resaltan visualmente
-- **Filas de nómina en verde** — Los comprobantes de tipo Nómina se resaltan visualmente
 
 ### Ordenamiento
 

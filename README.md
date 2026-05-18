@@ -19,14 +19,16 @@ Visor web de comprobantes fiscales digitales (CFDI) en formato XML. Permite carg
 - Extracción de Timbre Fiscal Digital (TFD) con UUID
 - Manejo de namespaces con detección automática y fallback
 - Errores descriptivos para XML malformado o versiones no soportadas
+- **Soporte específico Nómina** — Para CFDI tipo "N" se extraen campos del complemento `nomina12` (v1.2): Registro Patronal, Periodicidad de Pago, Departamento, Núm. Empleado, NSS, Fecha de Pago, Total Percepciones, Total Otras Deducciones, Total Impuestos Retenidos
 
 ### Tabla de datos
 
-- **22 columnas** — Fecha, serie, folio, RFC emisor, nombre emisor, moneda, tipo de cambio, base traslado, importe traslado, total, forma de pago, uso CFDI, régimen fiscal, clave producto/servicio, UUID, estatus, validez, tipo documento, versión, tipo comprobante, y más
+- **47 columnas** — Fecha, serie, folio, RFC emisor, nombre emisor, moneda, tipo de cambio, base traslado, importe traslado, total, forma de pago, uso CFDI, régimen fiscal, clave producto/servicio, UUID, estatus, validez, tipo documento, versión, tipo comprobante, y más
 - **Encabezados fijos** — Los headers permanecen visibles al hacer scroll vertical
 - **Scroll horizontal** — Todas las columnas accesibles en cualquier pantalla
 - **Filas alternadas** — Colores alternos para facilitar la lectura
 - **Filas de egreso en rojo** — Los comprobantes de tipo Egreso se resaltan visualmente
+- **Filas de nómina en verde** — Los comprobantes de tipo Nómina se resaltan visualmente
 
 ### Ordenamiento
 

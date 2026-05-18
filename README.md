@@ -19,7 +19,7 @@ Visor web de comprobantes fiscales digitales (CFDI) en formato XML. Permite carg
 - Extracción de Timbre Fiscal Digital (TFD) con UUID
 - Manejo de namespaces con detección automática y fallback
 - Errores descriptivos para XML malformado o versiones no soportadas
-- **Soporte específico Nómina** — Para CFDI tipo "N" se extraen campos del complemento `nomina12` (v1.2): Registro Patronal, Periodicidad de Pago, Departamento, Núm. Empleado, NSS, Fecha de Pago, Total Percepciones, Total Otras Deducciones, Total Impuestos Retenidos
+- **Soporte específico Nómina** — Para CFDI tipo "N" se extraen campos del complemento `nomina12` (v1.2): Registro Patronal, Periodicidad de Pago, Departamento, Núm. Empleado, NSS, Fecha de Pago, Total Percepciones, Total Otras Deducciones, Total Impuestos Retenidos. **PDF de recibo de nómina** con formato SAT (Emisor, Receptor, Datos Generales, Percepciones, Deducciones, Otros Pagos, Importe Neto, QR de verificación) generado desde el botón "PDF" por fila e "Imprimir Seleccionados"
 
 ### Tabla de datos
 

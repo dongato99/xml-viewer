@@ -142,11 +142,13 @@ const COLUMNS = [
 const ROW_STYLES = [
     { field: 'tipoComprobanteDesc', value: 'Egreso', className: 'row--egreso' },
     { field: 'tipoComprobanteDesc', value: 'Pago', className: 'row--pago' },
+    { field: 'tipoComprobanteDesc', value: 'Nómina', className: 'row--nomina' },
 ];
 
 const ROW_COLORS = [
     { field: 'tipoComprobanteDesc', value: 'Egreso', rgb: 'FF0000' },
     { field: 'tipoComprobanteDesc', value: 'Pago', rgb: '0000FF' },
+    { field: 'tipoComprobanteDesc', value: 'Nómina', rgb: '22C55E' },
 ];
 
 const grid = createGrid({

@@ -465,6 +465,10 @@ body {
     color: var(--accent);
 }
 
+.data-grid tbody tr.row--nomina {
+    color: var(--success);
+}
+
 /* === Status Bar === */
 .status-bar {
     padding: 8px 16px;

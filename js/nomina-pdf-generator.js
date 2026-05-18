@@ -379,5 +379,43 @@ export function generateNominaPdf(data) {
 
     y += SECTION_GAP;
 
+    // ============================================================
+    // 8. Deducciones (table + total)
+    // ============================================================
+    const ded = (data.nomina && data.nomina.deducciones) || { items: [] };
+    if (ded.items.length > 0 || ded.totalOtrasDeducciones || ded.totalImpuestosRetenidos) {
+        y = drawSectionTitle(doc, y, 'Deducciones');
+        const dedCols = [
+            { label: 'Tipo de deducción', w: 60, align: 'left' },
+            { label: 'Clave', w: 25, align: 'center' },
+            { label: 'Concepto', w: 60, align: 'left' },
+            { label: 'Importe', w: CONTENT_W - (60 + 25 + 60), align: 'right' },
+        ];
+        y = drawDataTable(doc, y, dedCols, ded.items.map(d => [
+            d.tipoDeduccionDesc || d.tipoDeduccion || '',
+            d.clave || '',
+            d.concepto || '',
+            fmtMoney(d.importe),
+        ]));
+
+        const sumDed = ded.items.reduce((s, d) => s + (parseFloat(d.importe) || 0), 0);
+        y = drawTotalRow(doc, y, dedCols, ['', '', 'Total Deducciones', '$' + fmtMoney(sumDed)]);
+        y += SECTION_GAP;
+
+        // ============================================================
+        // 9. Total deducciones (summary 2 cols)
+        // ============================================================
+        y = drawSectionTitle(doc, y, 'Total deducciones');
+        const sumColsDed = [
+            { label: 'Total otras deducciones', w: CONTENT_W / 2, align: 'right' },
+            { label: 'Total impuestos retenidos', w: CONTENT_W / 2, align: 'right' },
+        ];
+        y = drawDataTable(doc, y, sumColsDed, [[
+            fmtMoney(ded.totalOtrasDeducciones),
+            fmtMoney(ded.totalImpuestosRetenidos),
+        ]]);
+        y += SECTION_GAP;
+    }
+
     return doc.output('blob');
 }

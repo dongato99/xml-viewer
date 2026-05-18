@@ -141,3 +141,198 @@ export const MONEDA = {
 export function lookupMoneda(code) {
     return MONEDA[code] || code || '';
 }
+
+// ============================================================
+// Catálogos Nómina (complemento nomina12)
+// ============================================================
+
+export const TIPO_NOMINA = {
+    'O': 'Nómina ordinaria',
+    'E': 'Nómina extraordinaria',
+};
+
+export const PERIODICIDAD_PAGO = {
+    '01': 'Diario',
+    '02': 'Semanal',
+    '03': 'Catorcenal',
+    '04': 'Quincenal',
+    '05': 'Mensual',
+    '06': 'Bimestral',
+    '07': 'Unidad obra',
+    '08': 'Comisión',
+    '09': 'Precio alzado',
+    '10': 'Decenal',
+    '99': 'Otra Periodicidad',
+};
+
+export const RIESGO_PUESTO = {
+    '1': 'Clase I',
+    '2': 'Clase II',
+    '3': 'Clase III',
+    '4': 'Clase IV',
+    '5': 'Clase V',
+};
+
+export const TIPO_JORNADA = {
+    '01': 'Diurna',
+    '02': 'Nocturna',
+    '03': 'Mixta',
+    '04': 'Por hora',
+    '05': 'Reducida',
+    '06': 'Continuada',
+    '07': 'Partida',
+    '08': 'Por turnos',
+    '99': 'Otra Jornada',
+};
+
+export const TIPO_CONTRATO = {
+    '01': 'Contrato de trabajo por tiempo indeterminado',
+    '02': 'Contrato de trabajo para obra determinada',
+    '03': 'Contrato de trabajo por tiempo determinado',
+    '04': 'Contrato de trabajo por temporada',
+    '05': 'Contrato de trabajo sujeto a prueba',
+    '06': 'Contrato de trabajo con capacitación inicial',
+    '07': 'Modalidad de contratación por pago de hora laborada',
+    '08': 'Modalidad de trabajo por comisión laboral',
+    '09': 'Modalidades de contratación donde no existe relación de trabajo',
+    '10': 'Jubilación, pensión, retiro',
+    '99': 'Otro contrato',
+};
+
+export const TIPO_REGIMEN_CONTRATACION = {
+    '02': 'Sueldos (Incluye ingresos señalados en la fracción I del artículo 94 de LISR)',
+    '03': 'Jubilados',
+    '04': 'Pensionados',
+    '05': 'Asimilados Miembros Sociedades Cooperativas Producción',
+    '06': 'Asimilados Integrantes Sociedades Asociaciones Civiles',
+    '07': 'Asimilados Miembros consejos',
+    '08': 'Asimilados comisionistas',
+    '09': 'Asimilados Honorarios',
+    '10': 'Asimilados acciones',
+    '11': 'Asimilados otros',
+    '12': 'Jubilados o Pensionados',
+    '13': 'Indemnización o Separación',
+    '99': 'Otro Régimen',
+};
+
+export const TIPO_PERCEPCION = {
+    '001': 'Sueldos, Salarios Rayas y Jornales',
+    '002': 'Gratificación Anual (Aguinaldo)',
+    '003': 'Participación de los Trabajadores en las Utilidades PTU',
+    '004': 'Reembolso de Gastos Médicos Dentales y Hospitalarios',
+    '005': 'Fondo de Ahorro',
+    '006': 'Caja de ahorro',
+    '009': 'Contribuciones a Cargo del Trabajador Pagadas por el Patrón',
+    '010': 'Premios por puntualidad',
+    '011': 'Prima de Seguro de vida',
+    '012': 'Seguro de Gastos Médicos Mayores',
+    '013': 'Cuotas Sindicales Pagadas por el Patrón',
+    '014': 'Subsidios por incapacidad',
+    '015': 'Becas para trabajadores y/o hijos',
+    '019': 'Horas extra',
+    '020': 'Prima dominical',
+    '021': 'Prima vacacional',
+    '022': 'Prima por antigüedad',
+    '023': 'Pagos por separación',
+    '024': 'Seguro de retiro',
+    '025': 'Indemnizaciones',
+    '026': 'Reembolso por funeral',
+    '027': 'Cuotas de seguridad social pagadas por el patrón',
+    '028': 'Comisiones',
+    '029': 'Vales de despensa',
+    '030': 'Vales de restaurante',
+    '031': 'Vales de gasolina',
+    '032': 'Vales de ropa',
+    '033': 'Ayuda para renta',
+    '034': 'Ayuda para artículos escolares',
+    '035': 'Ayuda para anteojos',
+    '036': 'Ayuda para transporte',
+    '037': 'Ayuda para gastos de funeral',
+    '038': 'Otros ingresos por salarios',
+    '039': 'Jubilaciones, pensiones o haberes de retiro',
+    '044': 'Jubilaciones, pensiones o haberes de retiro en parcialidades',
+    '045': 'Ingresos en acciones o títulos valor que representan bienes',
+    '046': 'Ingresos asimilados a salarios',
+    '047': 'Alimentación',
+    '048': 'Habitación',
+    '049': 'Premios por asistencia',
+    '050': 'Viáticos',
+    '051': 'Pagos por gratificaciones, primas, compensaciones, recompensas u otros',
+};
+
+export const TIPO_DEDUCCION = {
+    '001': 'Seguridad social',
+    '002': 'ISR',
+    '003': 'Aportaciones a retiro, cesantía en edad avanzada y vejez.',
+    '004': 'Otros',
+    '005': 'Aportaciones a Fondo de vivienda',
+    '006': 'Descuento por incapacidad',
+    '007': 'Pensión alimenticia',
+    '008': 'Renta',
+    '009': 'Préstamos provenientes del Fondo Nacional de la Vivienda para los Trabajadores',
+    '010': 'Pago por crédito de vivienda',
+    '011': 'Pago de abonos INFONACOT',
+    '012': 'Anticipo de salarios',
+    '013': 'Pagos hechos con exceso al trabajador',
+    '014': 'Errores',
+    '015': 'Pérdidas',
+    '016': 'Averías',
+    '017': 'Adquisición de artículos producidos por la empresa o establecimiento',
+    '018': 'Cuotas para la constitución y fomento de sociedades cooperativas y de cajas de ahorro',
+    '019': 'Cuotas sindicales',
+    '020': 'Ausencia (Ausentismo)',
+    '021': 'Cuotas obrero patronales',
+    '022': 'Impuestos Locales',
+    '023': 'Aportaciones voluntarias',
+    '024': 'Ajuste en Gratificación Anual (Aguinaldo) Exento',
+    '025': 'Ajuste en Gratificación Anual (Aguinaldo) Gravado',
+    '045': 'I.S.R.',
+    '052': 'I.M.S.S.',
+    '101': 'ISR Retenido de ejercicio anterior',
+    '107': 'Ajuste al Subsidio Causado',
+};
+
+export const TIPO_OTRO_PAGO = {
+    '001': 'Reintegro de ISR pagado en exceso (siempre que no haya sido enterado al SAT)',
+    '002': 'Subsidio para el empleo (efectivamente entregado al trabajador)',
+    '003': 'Viáticos (entregados al trabajador)',
+    '004': 'Aplicación de saldo a favor por compensación anual',
+    '005': 'Reintegro de ISR retenido en exceso de ejercicio anterior',
+    '099': 'Pagos distintos a los listados y que no deben considerarse como ingreso por sueldos, salarios o ingresos asimilados.',
+};
+
+export function lookupTipoNomina(code) {
+    return TIPO_NOMINA[code] || code || '';
+}
+
+export function lookupPeriodicidadPago(code) {
+    return PERIODICIDAD_PAGO[code] || code || '';
+}
+
+export function lookupRiesgoPuesto(code) {
+    return RIESGO_PUESTO[code] || code || '';
+}
+
+export function lookupTipoJornada(code) {
+    return TIPO_JORNADA[code] || code || '';
+}
+
+export function lookupTipoContrato(code) {
+    return TIPO_CONTRATO[code] || code || '';
+}
+
+export function lookupTipoRegimenContratacion(code) {
+    return TIPO_REGIMEN_CONTRATACION[code] || code || '';
+}
+
+export function lookupTipoPercepcion(code) {
+    return TIPO_PERCEPCION[code] || code || '';
+}
+
+export function lookupTipoDeduccion(code) {
+    return TIPO_DEDUCCION[code] || code || '';
+}
+
+export function lookupTipoOtroPago(code) {
+    return TIPO_OTRO_PAGO[code] || code || '';
+}

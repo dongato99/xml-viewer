@@ -488,5 +488,34 @@ export function generateNominaPdf(data) {
     doc.line(MARGIN, y, MARGIN + CONTENT_W, y);
     y += SECTION_GAP;
 
+    // ============================================================
+    // 14. Sellos digitales
+    // ============================================================
+    const sealFontSize = SMALL_FONT;
+    doc.setFontSize(sealFontSize);
+    const selloLines = doc.splitTextToSize(data.sello || '', CONTENT_W - 2);
+    const selloSATLines = doc.splitTextToSize(data.tfd?.selloSAT || '', CONTENT_W - 2);
+    const sealHeight = 8 + selloLines.length * 2 + 8 + selloSATLines.length * 2;
+
+    y = ensureSpace(doc, y, sealHeight);
+
+    doc.setFontSize(NORMAL_FONT);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sello digital del CFDI:', MARGIN, y);
+    y += 3;
+    doc.setFontSize(sealFontSize);
+    doc.setFont('helvetica', 'normal');
+    doc.text(selloLines, MARGIN, y);
+    y += selloLines.length * 2 + 3;
+
+    doc.setFontSize(NORMAL_FONT);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sello digital del SAT:', MARGIN, y);
+    y += 3;
+    doc.setFontSize(sealFontSize);
+    doc.setFont('helvetica', 'normal');
+    doc.text(selloSATLines, MARGIN, y);
+    y += selloSATLines.length * 2 + SECTION_GAP;
+
     return doc.output('blob');
 }

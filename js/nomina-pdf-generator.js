@@ -399,7 +399,7 @@ export function generateNominaPdf(data) {
         ]));
 
         const sumDed = ded.items.reduce((s, d) => s + (parseFloat(d.importe) || 0), 0);
-        y = drawTotalRow(doc, y, dedCols, ['', '', 'Total Deducciones', '$' + fmtMoney(sumDed)]);
+        y = drawTotalRow(doc, y, dedCols, ['', '', 'Total Deducciones', '$ ' + fmtMoney(sumDed)]);
         y += SECTION_GAP;
 
         // ============================================================

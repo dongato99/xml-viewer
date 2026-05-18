@@ -2,6 +2,7 @@ import { parseCFDI } from './cfdi-parser.js';
 import { parseCFDIForPrint } from './cfdi-print-parser.js';
 import { generateCFDIPdf } from './pdf-generator.js';
 import { parsePagoCFDI } from './cfdi-pago-parser.js';
+import { parseNominaCFDI } from './cfdi-nomina-parser.js';
 import { parsePagoCFDIForPrint } from './cfdi-pago-print-parser.js';
 import { generatePagoPdf } from './pago-pdf-generator.js';
 import { createGrid } from './grid.js';
@@ -309,6 +310,17 @@ function processXML(xmlString, filename) {
         }
         if (result.rows && result.rows.length > 0) {
             addRows(result.rows, result.uuid, xmlString);
+        }
+    } else if (tipo === 'N') {
+        const result = parseNominaCFDI(xmlString, filename);
+        if (result && result.error) {
+            showWarning(`${filename}: versión CFDI no soportada (${result.version})`);
+            return;
+        }
+        if (result) {
+            addRows([result], result.uuid, xmlString);
+        } else {
+            showWarning(`No se pudo parsear: ${filename}`);
         }
     } else {
         const result = parseCFDI(xmlString, filename);

@@ -517,5 +517,48 @@ export function generateNominaPdf(data) {
     doc.text(selloSATLines, MARGIN, y);
     y += selloSATLines.length * 2 + SECTION_GAP;
 
+    // ============================================================
+    // 15. QR Code + Certification (left QR, right cadena+meta)
+    // ============================================================
+    const qrSize = 38;
+    const certBlockH = qrSize + 4;
+
+    y = ensureSpace(doc, y, certBlockH);
+
+    try {
+        const qrUrl = buildQRUrl(data);
+        const qr = qrcode(0, 'M');
+        qr.addData(qrUrl);
+        qr.make();
+        const dataUrl = qr.createDataURL(4);
+        doc.addImage(dataUrl, 'PNG', MARGIN, y, qrSize, qrSize);
+    } catch (e) {
+        doc.setDrawColor(180, 180, 180);
+        doc.rect(MARGIN, y, qrSize, qrSize);
+        doc.setFontSize(6);
+        doc.text('QR no disponible', MARGIN + 2, y + qrSize / 2);
+    }
+
+    const certX = MARGIN + qrSize + 5;
+    const certW = CONTENT_W - qrSize - 5;
+    let certY = y;
+
+    doc.setFontSize(SMALL_FONT);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cadena Original del complemento de certificación digital del SAT:', certX, certY);
+    certY += 2.5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(4.5);
+    const cadenaLines = doc.splitTextToSize(data.cadenaOriginal || '', certW);
+    doc.text(cadenaLines, certX, certY);
+    certY += cadenaLines.length * 1.8 + 2;
+
+    doc.setFontSize(SMALL_FONT);
+    certY = drawLabelValue(doc, certX, certY, certW, 'RFC del proveedor de certificación: ', data.tfd?.rfcProvCertif || '', SMALL_FONT);
+    certY = drawLabelValue(doc, certX, certY, certW, 'No. de serie del certificado SAT: ', data.tfd?.noCertificadoSAT || '', SMALL_FONT);
+    certY = drawLabelValue(doc, certX, certY, certW, 'Fecha y hora de certificación: ', data.tfd?.fechaTimbrado || '', SMALL_FONT);
+
+    y = Math.max(y + qrSize, certY) + SECTION_GAP;
+
     return doc.output('blob');
 }

@@ -417,5 +417,42 @@ export function generateNominaPdf(data) {
         y += SECTION_GAP;
     }
 
+    // ============================================================
+    // 10. Otros pagos (table + total) — conditional
+    // ============================================================
+    const otrosPagos = (data.nomina && data.nomina.otrosPagos) || [];
+    if (otrosPagos.length > 0) {
+        y = drawSectionTitle(doc, y, 'Otros pagos');
+        const opCols = [
+            { label: 'Tipo otro pago', w: 70, align: 'left' },
+            { label: 'Clave', w: 20, align: 'center' },
+            { label: 'Concepto', w: 50, align: 'left' },
+            { label: 'Importe', w: CONTENT_W - (70 + 20 + 50), align: 'right' },
+        ];
+        y = drawDataTable(doc, y, opCols, otrosPagos.map(op => [
+            op.tipoOtroPagoDesc || op.tipoOtroPago || '',
+            op.clave || '',
+            op.concepto || '',
+            fmtMoney(op.importe),
+        ]));
+
+        const sumOp = otrosPagos.reduce((s, op) => s + (parseFloat(op.importe) || 0), 0);
+        y = drawTotalRow(doc, y, opCols, ['', '', 'Total Otros Pagos:', '$ ' + fmtMoney(sumOp)]);
+        y += SECTION_GAP;
+
+        // ============================================================
+        // 11. Subsidio al empleo — conditional
+        // ============================================================
+        const subsidio = otrosPagos.find(op => op.subsidio);
+        if (subsidio) {
+            y = drawSectionTitle(doc, y, 'Subsidio al empleo');
+            const subCols = [
+                { label: 'Subsidio causado', w: CONTENT_W, align: 'right' },
+            ];
+            y = drawDataTable(doc, y, subCols, [[fmtMoney(subsidio.subsidio.subsidioCausado)]]);
+            y += SECTION_GAP;
+        }
+    }
+
     return doc.output('blob');
 }

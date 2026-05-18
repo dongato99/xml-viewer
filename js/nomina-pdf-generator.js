@@ -168,7 +168,83 @@ export function generateNominaPdf(data) {
 
     y = Math.max(leftY, rightY) + SECTION_GAP;
 
-    // (Rest of sections — added in subsequent tasks.)
+    // ============================================================
+    // 5. Concepto (single row)
+    // ============================================================
+    y = drawSectionTitle(doc, y, 'Concepto');
+
+    const conceptCols = [
+        { label: 'Cve del producto/servicio', w: 22, align: 'left' },
+        { label: 'No. identificación', w: 18, align: 'left' },
+        { label: 'Cantidad', w: 14, align: 'right' },
+        { label: 'Clave unidad', w: 16, align: 'left' },
+        { label: 'Unidad', w: 14, align: 'left' },
+        { label: 'Descripcion', w: 26, align: 'left' },
+        { label: 'Valor unitario', w: 18, align: 'right' },
+        { label: 'Importe', w: 18, align: 'right' },
+        { label: 'Descuento', w: 18, align: 'right' },
+        { label: 'Objeto impuesto', w: CONTENT_W - (22 + 18 + 14 + 16 + 14 + 26 + 18 + 18 + 18), align: 'left' },
+    ];
+
+    const c0 = (data.conceptos && data.conceptos[0]) || {};
+    const conceptVals = [
+        c0.claveProdServ || '',
+        c0.noIdentificacion || '',
+        c0.cantidad || '',
+        c0.claveUnidad || '',
+        c0.unidad || '',
+        c0.descripcion || '',
+        fmtMoney(c0.valorUnitario),
+        fmtMoney(c0.importe),
+        c0.descuento ? fmtMoney(c0.descuento) : '',
+        c0.objetoImpDesc || c0.objetoImp || '',
+    ];
+
+    const LINE_H = 2.2;
+    const CELL_PAD = 1;
+
+    y = ensureSpace(doc, y, HEADER_ROW_H + ROW_H + 2);
+
+    // Header row
+    doc.setFillColor(...GRAY_BG);
+    doc.rect(MARGIN, y, CONTENT_W, HEADER_ROW_H, 'F');
+    doc.setDrawColor(100, 100, 100);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(TABLE_FONT);
+    let cx = MARGIN;
+    for (const col of conceptCols) {
+        doc.rect(cx, y, col.w, HEADER_ROW_H);
+        const lines = doc.splitTextToSize(col.label, col.w - 2);
+        const textX = col.align === 'right' ? cx + col.w - 1 : cx + 1;
+        for (let li = 0; li < lines.length; li++) {
+            doc.text(lines[li], textX, y + 2.3 + li * LINE_H, { align: col.align === 'right' ? 'right' : 'left' });
+        }
+        cx += col.w;
+    }
+    y += HEADER_ROW_H;
+
+    // Data row — compute wrapped lines per cell and max height
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(TABLE_FONT);
+    const cellLines = [];
+    let maxLines = 1;
+    for (let i = 0; i < conceptCols.length; i++) {
+        const lines = doc.splitTextToSize(String(conceptVals[i]), conceptCols[i].w - 2);
+        cellLines.push(lines);
+        if (lines.length > maxLines) maxLines = lines.length;
+    }
+    const dataRowH = Math.max(ROW_H, maxLines * LINE_H + CELL_PAD * 2);
+    cx = MARGIN;
+    for (let i = 0; i < conceptCols.length; i++) {
+        const col = conceptCols[i];
+        doc.rect(cx, y, col.w, dataRowH);
+        const textX = col.align === 'right' ? cx + col.w - 1 : cx + 1;
+        for (let li = 0; li < cellLines[i].length; li++) {
+            doc.text(cellLines[i][li], textX, y + CELL_PAD + LINE_H * 0.9 + li * LINE_H, { align: col.align === 'right' ? 'right' : 'left' });
+        }
+        cx += col.w;
+    }
+    y += dataRowH + SECTION_GAP;
 
     return doc.output('blob');
 }

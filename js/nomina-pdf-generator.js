@@ -60,6 +60,89 @@ function drawSectionTitle(doc, y, title) {
     return y + 4;
 }
 
+function drawDataTable(doc, y, columns, rows) {
+    const totalW = columns.reduce((s, c) => s + c.w, 0);
+    const LINE_H = 2.2;
+    const CELL_PAD = 1;
+
+    // Header lines + height
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(TABLE_FONT);
+    const headerLines = columns.map(col => doc.splitTextToSize(col.label, col.w - 2));
+    const maxHeaderLines = Math.max(1, ...headerLines.map(l => l.length));
+    const headerH = Math.max(HEADER_ROW_H, maxHeaderLines * LINE_H + CELL_PAD * 2);
+
+    y = ensureSpace(doc, y, headerH + rows.length * ROW_H);
+
+    // Header
+    doc.setFillColor(...GRAY_BG);
+    doc.rect(MARGIN, y, totalW, headerH, 'F');
+    doc.setDrawColor(100, 100, 100);
+    let cx = MARGIN;
+    for (let i = 0; i < columns.length; i++) {
+        const col = columns[i];
+        doc.rect(cx, y, col.w, headerH);
+        const lines = headerLines[i];
+        const align = col.align === 'right' ? 'right' : (col.align === 'center' ? 'center' : 'left');
+        const textX = align === 'right' ? cx + col.w - 1 : (align === 'center' ? cx + col.w / 2 : cx + 1);
+        for (let li = 0; li < lines.length; li++) {
+            doc.text(lines[li], textX, y + 2.3 + li * LINE_H, { align });
+        }
+        cx += col.w;
+    }
+    y += headerH;
+
+    // Data rows
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(TABLE_FONT);
+    for (const row of rows) {
+        // Compute per-cell wrapped lines and row height
+        const cellLines = [];
+        let maxLines = 1;
+        for (let i = 0; i < columns.length; i++) {
+            const lines = doc.splitTextToSize(String(row[i] ?? ''), columns[i].w - 2);
+            cellLines.push(lines);
+            if (lines.length > maxLines) maxLines = lines.length;
+        }
+        const rowH = Math.max(ROW_H, maxLines * LINE_H + CELL_PAD * 2);
+        y = ensureSpace(doc, y, rowH);
+
+        cx = MARGIN;
+        for (let i = 0; i < columns.length; i++) {
+            const col = columns[i];
+            doc.rect(cx, y, col.w, rowH);
+            const align = col.align === 'right' ? 'right' : (col.align === 'center' ? 'center' : 'left');
+            const textX = align === 'right' ? cx + col.w - 1 : (align === 'center' ? cx + col.w / 2 : cx + 1);
+            for (let li = 0; li < cellLines[i].length; li++) {
+                doc.text(cellLines[i][li], textX, y + CELL_PAD + LINE_H * 0.9 + li * LINE_H, { align });
+            }
+            cx += col.w;
+        }
+        y += rowH;
+    }
+
+    return y;
+}
+
+function drawTotalRow(doc, y, columns, values) {
+    const totalW = columns.reduce((s, c) => s + c.w, 0);
+    y = ensureSpace(doc, y, ROW_H);
+    doc.setDrawColor(100, 100, 100);
+    let cx = MARGIN;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(TABLE_FONT);
+    for (let i = 0; i < columns.length; i++) {
+        const col = columns[i];
+        // No fill, just border
+        doc.rect(cx, y, col.w, ROW_H);
+        const align = col.align === 'right' ? 'right' : (col.align === 'center' ? 'center' : 'left');
+        const textX = align === 'right' ? cx + col.w - 1 : (align === 'center' ? cx + col.w / 2 : cx + 1);
+        doc.text(String(values[i] ?? ''), textX, y + 3.2, { align });
+        cx += col.w;
+    }
+    return y + ROW_H;
+}
+
 function buildQRUrl(data) {
     const uuid = data.tfd?.uuid || '';
     const reEmisor = data.emisor?.rfc || '';
@@ -245,6 +328,56 @@ export function generateNominaPdf(data) {
         cx += col.w;
     }
     y += dataRowH + SECTION_GAP;
+
+    // ============================================================
+    // 6. Percepciones (table N rows + total row)
+    // ============================================================
+    y = drawSectionTitle(doc, y, 'Percepciones');
+
+    const perc = (data.nomina && data.nomina.percepciones) || { items: [] };
+    const percCols = [
+        { label: 'Tipo de percepción', w: 50, align: 'left' },
+        { label: 'Clave', w: 20, align: 'center' },
+        { label: 'Concepto', w: 50, align: 'left' },
+        { label: 'Importe gravado', w: 30, align: 'right' },
+        { label: 'Importe exento', w: CONTENT_W - (50 + 20 + 50 + 30), align: 'right' },
+    ];
+
+    y = drawDataTable(doc, y, percCols, perc.items.map(p => [
+        p.tipoPercepcionDesc || p.tipoPercepcion || '',
+        p.clave || '',
+        p.concepto || '',
+        fmtMoney(p.importeGravado),
+        fmtMoney(p.importeExento),
+    ]));
+
+    // Total row
+    const sumGravado = perc.items.reduce((s, p) => s + (parseFloat(p.importeGravado) || 0), 0);
+    const sumExento = perc.items.reduce((s, p) => s + (parseFloat(p.importeExento) || 0), 0);
+    y = drawTotalRow(doc, y, percCols, [
+        '', '', 'Total Percepciones',
+        '$ ' + fmtMoney(sumGravado),
+        '$ ' + fmtMoney(sumExento),
+    ]);
+
+    y += SECTION_GAP;
+
+    // ============================================================
+    // 7. Total percepciones (summary 3 cols)
+    // ============================================================
+    y = drawSectionTitle(doc, y, 'Total percepciones');
+    const sumCols3 = [
+        { label: 'Total sueldos', w: CONTENT_W / 3, align: 'right' },
+        { label: 'Total exento', w: CONTENT_W / 3, align: 'right' },
+        { label: 'Total gravado', w: CONTENT_W / 3, align: 'right' },
+    ];
+    y = drawDataTable(doc, y, sumCols3, [[
+        fmtMoney(perc.totalSueldos),
+        fmtMoney(perc.totalExento),
+        fmtMoney(perc.totalGravado),
+    ]]);
+
+    y += SECTION_GAP;
 
     return doc.output('blob');
 }

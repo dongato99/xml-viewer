@@ -175,6 +175,10 @@ const grid = createGrid({
         const xml = xmlStore.get(uuid);
         if (!xml) return;
         const tipo = detectTipoComprobante(xml);
+        if (tipo === 'N') {
+            showWarning('PDF de Nómina no soportado');
+            return;
+        }
         if (tipo === 'P') {
             generateAndDownloadPDF(uuid, xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
         } else {
@@ -413,6 +417,10 @@ async function generateAndDownloadSelectedPDFs() {
     if (uniqueUuids.length === 1) {
         const xml = xmlStore.get(uniqueUuids[0]);
         const tipo = detectTipoComprobante(xml);
+        if (tipo === 'N') {
+            showWarning('PDF de Nómina no soportado');
+            return;
+        }
         if (tipo === 'P') {
             generateAndDownloadPDF(uniqueUuids[0], xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
         } else {
@@ -422,9 +430,14 @@ async function generateAndDownloadSelectedPDFs() {
     }
 
     const zip = new JSZip();
+    let nominaSkipped = 0;
     for (const uuid of uniqueUuids) {
         const xml = xmlStore.get(uuid);
         const tipo = detectTipoComprobante(xml);
+        if (tipo === 'N') {
+            nominaSkipped++;
+            continue;
+        }
         let blob;
         if (tipo === 'P') {
             blob = generatePDFBlob(uuid, xmlStore, parsePagoCFDIForPrint, generatePagoPdf);
@@ -432,6 +445,12 @@ async function generateAndDownloadSelectedPDFs() {
             blob = generatePDFBlob(uuid, xmlStore, parseCFDIForPrint, generateCFDIPdf);
         }
         if (blob) zip.file(uuid + '.pdf', blob);
+    }
+    if (nominaSkipped > 0) {
+        showWarning(`PDF de Nómina no soportado — ${nominaSkipped} fila${nominaSkipped !== 1 ? 's' : ''} omitida${nominaSkipped !== 1 ? 's' : ''}`);
+    }
+    if (nominaSkipped === uniqueUuids.length) {
+        return;
     }
     const zipBlob = await zip.generateAsync({ type: 'blob' });
 
